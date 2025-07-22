@@ -27,6 +27,7 @@ import config from "@/config";
 
 export const metadata = getSEOTags({
   title: `Privacy Policy | ${config.appName}`,
+  description: "SpinDeck's privacy policy. Learn how we collect, use, and protect your personal information and music data.",
   canonicalUrlRelative: "/privacy-policy",
 });
 

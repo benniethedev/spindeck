@@ -26,7 +26,8 @@ import config from "@/config";
 // Please write a simple Terms & Services for my site. Add the current date. Do not add or explain your reasoning. Answer:
 
 export const metadata = getSEOTags({
-  title: `Terms and Conditions | ${config.appName}`,
+  title: `Terms of Service | ${config.appName}`,
+  description: "Read SpinDeck's terms of service. Learn about our platform rules, user responsibilities, and legal agreements.",
   canonicalUrlRelative: "/tos",
 });
 
