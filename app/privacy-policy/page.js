@@ -57,51 +57,148 @@ const PrivacyPolicy = () => {
           className="leading-relaxed whitespace-pre-wrap"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: 2023-08-25
+          {`Last Updated: December 22, 2024
 
-Thank you for visiting ShipFast ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://shipfa.st (the "Website").
+Thank you for using SpinDeck ("we," "us," or "our"). This Privacy Policy explains how we collect, use, and protect your information when you use our website at https://spindeck.com and our music platform services. SpinDeck is operated by NetSwagger LLC.
 
-By accessing or using the Website, you agree to the terms of this Privacy Policy. If you do not agree with the practices described in this policy, please do not use the Website.
+By using SpinDeck, you agree to the collection and use of information in accordance with this Privacy Policy.
 
 1. Information We Collect
 
-1.1 Personal Data
+1.1 Personal Information
 
-We collect the following personal information from you:
+We collect the following personal information:
 
-Name: We collect your name to personalize your experience and communicate with you effectively.
-Email: We collect your email address to send you important information regarding your orders, updates, and communication.
-Payment Information: We collect payment details to process your orders securely. However, we do not store your payment information on our servers. Payments are processed by trusted third-party payment processors.
+- Name: For account personalization and communication
+- Email Address: For account management, notifications, and support
+- Payment Information: Processed securely through Stripe (we do not store payment details)
+- Profile Information: Username, bio, profile pictures, and other optional details
+- Music Content: For artists, this includes uploaded tracks, artwork, and metadata
+- User Preferences: Genre preferences, subscription choices, and account settings
 
-1.2 Non-Personal Data
+1.2 Automatically Collected Information
 
-We may use web cookies and similar technologies to collect non-personal information such as your IP address, browser type, device information, and browsing patterns. This information helps us to enhance your browsing experience, analyze trends, and improve our services.
+- Usage Analytics: Track plays, downloads, user interactions with music content
+- Technical Information: IP address, browser type, device information, operating system
+- Cookies and Tracking: To improve user experience and analyze platform usage
+- Performance Data: Platform performance metrics and error reporting
 
-2. Purpose of Data Collection
+1.3 Music and Content Data
 
-We collect and use your personal data for the sole purpose of order processing. This includes processing your orders, sending order confirmations, providing customer support, and keeping you updated about the status of your orders.
+- Audio Files: Uploaded by artists for distribution and promotion
+- Metadata: Track information including genre, BPM, key, and other musical details
+- User-Generated Content: Comments, reviews, and other community interactions
 
-3. Data Sharing
+2. How We Use Your Information
 
-We do not share your personal data with any third parties except as required for order processing (e.g., sharing your information with payment processors). We do not sell, trade, or rent your personal information to others.
+We use collected information for:
 
-4. Children's Privacy
+- Platform Operations: Account management, authentication, and service delivery
+- Music Distribution: Processing, hosting, and distributing uploaded music content
+- Analytics and Insights: Providing performance metrics to artists and platform analytics
+- Communication: Service updates, promotional campaigns, and customer support
+- Payment Processing: Handling subscriptions and transaction processing
+- Platform Improvement: Enhancing user experience and developing new features
+- Legal Compliance: Meeting regulatory requirements and preventing abuse
 
-ShipFast is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
+3. Information Sharing and Disclosure
 
-5. Updates to the Privacy Policy
+We share information in these circumstances:
 
-We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. Any updates will be posted on this page, and we may notify you via email about significant changes.
+- Service Providers: With trusted third-party services (Stripe for payments, Supabase for data storage)
+- Music Promotion: Artists' music and metadata are shared with DJs and industry contacts through our platform
+- Legal Requirements: When required by law, legal process, or government request
+- Platform Features: Public profile information and approved music content visible to other users
+- Business Transfers: In case of merger, acquisition, or sale of business assets
 
-6. Contact Information
+We do not sell personal information to third parties for marketing purposes.
 
-If you have any questions, concerns, or requests related to this Privacy Policy, you can contact us at:
+4. Data Security
 
-Email: marc@shipfa.st
+We implement appropriate security measures to protect your information:
 
-For all other inquiries, please visit our Contact Us page on the Website.
+- Encryption of data in transit and at rest
+- Regular security assessments and updates
+- Access controls and authentication measures
+- Secure payment processing through PCI-compliant providers
+- Regular data backups and recovery procedures
 
-By using ShipFast, you consent to the terms of this Privacy Policy.`}
+5. Your Rights and Choices
+
+You have the following rights:
+
+- Access: Request access to your personal information
+- Correction: Update or correct inaccurate information
+- Deletion: Request deletion of your account and associated data
+- Data Portability: Request export of your data in a portable format
+- Communication Preferences: Opt out of marketing communications
+- Cookie Controls: Manage cookie preferences through browser settings
+
+6. Data Retention
+
+We retain your information:
+
+- Account Information: While your account is active and for a reasonable period after closure
+- Music Content: As long as it remains on the platform or as required by legal obligations
+- Analytics Data: In aggregated, anonymized form for business intelligence purposes
+- Payment Records: As required by financial regulations and tax law
+
+7. Children's Privacy
+
+SpinDeck is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will take steps to delete it promptly.
+
+8. International Data Transfers
+
+Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place to protect your information during such transfers.
+
+9. Third-Party Services
+
+SpinDeck integrates with third-party services:
+
+- Supabase: Database and authentication services
+- Stripe: Payment processing
+- Email Services: For platform communications
+- Analytics Tools: For platform performance monitoring
+
+These services have their own privacy policies governing their data practices.
+
+10. Cookies and Tracking Technologies
+
+We use cookies and similar technologies to:
+
+- Maintain user sessions and authentication
+- Remember user preferences and settings
+- Analyze platform usage and performance
+- Provide personalized content recommendations
+
+You can control cookie settings through your browser preferences.
+
+11. Changes to This Privacy Policy
+
+We may update this Privacy Policy periodically. We will notify users of material changes through:
+
+- Email notifications to registered users
+- Platform notifications and announcements
+- Updates posted on our website
+
+Continued use of SpinDeck after changes constitutes acceptance of the updated Privacy Policy.
+
+12. Contact Information
+
+For questions about this Privacy Policy or data practices, contact us:
+
+Email: privacy@spindeck.com
+Support: support@spindeck.com
+Website: https://spindeck.com/contact
+
+Mailing Address:
+NetSwagger LLC
+Music Division - Privacy Office
+United States
+
+Data Protection Officer: privacy@spindeck.com
+
+By using SpinDeck, you acknowledge that you have read and understood this Privacy Policy and agree to our data practices as described herein.`}
         </pre>
       </div>
     </main>

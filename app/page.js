@@ -253,8 +253,8 @@ export default function Page() {
                 <h3 className="text-white font-semibold mb-4">Product</h3>
                 <ul className="space-y-2">
                   <li><Link href="/pricing" className="text-spindeck-gray hover:text-white transition">Pricing</Link></li>
-                  <li><Link href="/features" className="text-spindeck-gray hover:text-white transition">Features</Link></li>
                   <li><Link href="/dj-pool" className="text-spindeck-gray hover:text-white transition">DJ Pool</Link></li>
+                  <li><Link href="/contact" className="text-spindeck-gray hover:text-white transition">Contact</Link></li>
                 </ul>
               </div>
               
@@ -263,7 +263,6 @@ export default function Page() {
                 <ul className="space-y-2">
                   <li><Link href="/about" className="text-spindeck-gray hover:text-white transition">About</Link></li>
                   <li><Link href="/contact" className="text-spindeck-gray hover:text-white transition">Contact</Link></li>
-                  <li><Link href="/blog" className="text-spindeck-gray hover:text-white transition">Blog</Link></li>
                 </ul>
               </div>
               
@@ -277,7 +276,18 @@ export default function Page() {
             </div>
             
             <div className="mt-8 pt-8 border-t border-spindeck-dark text-center">
-              <p className="text-spindeck-gray">© 2024 {config.appName}. All rights reserved.</p>
+              <p className="text-spindeck-gray mb-2">© 2024 {config.appName}. All rights reserved.</p>
+              <p className="text-sm text-spindeck-gray">
+                SpinDeck is a subsidiary of{" "}
+                <a 
+                  href="https://netswagger.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-spindeck-red hover:text-red-400 transition-colors"
+                >
+                  NetSwagger LLC
+                </a>
+              </p>
             </div>
           </div>
         </footer>

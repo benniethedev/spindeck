@@ -20,22 +20,50 @@ export default function ArtistDashboard({ user, profile }) {
     totalDownloads: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [planInfo, setPlanInfo] = useState(null);
 
   const supabase = createClient();
 
   useEffect(() => {
     fetchStats();
+    fetchPlanInfo();
   }, [user.id]);
 
   const fetchStats = async () => {
     try {
+      // First ensure user has a profile
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError && profileError.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        const { error: createError } = await supabase
+          .from("profiles")
+          .insert([{ 
+            id: user.id, 
+            role: 'artist',
+            full_name: user.user_metadata?.full_name || null,
+            avatar_url: user.user_metadata?.avatar_url || null
+          }]);
+        
+        if (createError) {
+          console.error("Error creating profile:", createError);
+        }
+      }
+
       // Fetch track stats
       const { data: tracks, error: tracksError } = await supabase
         .from("tracks")
         .select("status, play_count, download_count")
         .eq("user_id", user.id);
 
-      if (tracksError) throw tracksError;
+      if (tracksError) {
+        console.error("Tracks query error:", tracksError);
+        throw tracksError;
+      }
 
       const totalTracks = tracks?.length || 0;
       const approvedTracks = tracks?.filter(track => track.status === "approved").length || 0;
@@ -52,9 +80,57 @@ export default function ArtistDashboard({ user, profile }) {
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
+      console.error("Error details:", error.message, error.code, error.details);
       toast.error("Failed to load statistics");
+      
+      // Set default stats to prevent UI issues
+      setStats({
+        totalTracks: 0,
+        approvedTracks: 0,
+        pendingTracks: 0,
+        totalPlays: 0,
+        totalDownloads: 0,
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPlanInfo = async () => {
+    try {
+      // Get user's current plan
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("plan_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.plan_id) {
+        // Get plan details
+        const { data: plan, error: planError } = await supabase
+          .from("plans")
+          .select("*")
+          .eq("id", profile.plan_id)
+          .single();
+
+        if (plan) {
+          setPlanInfo(plan);
+        }
+      } else {
+        // User doesn't have a plan - show default/free tier
+        setPlanInfo({
+          name: "Free",
+          price: 0,
+          features: { tracks_per_month: 0, email_blasts: 0, analytics: false }
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching plan info:", error);
+      setPlanInfo({
+        name: "Free",
+        price: 0,
+        features: { tracks_per_month: 0, email_blasts: 0, analytics: false }
+      });
     }
   };
 
@@ -152,6 +228,89 @@ export default function ArtistDashboard({ user, profile }) {
                   <div className="bg-spindeck-dark rounded-lg p-6 border border-gray-800">
                     <h3 className="text-sm font-medium text-spindeck-gray mb-2">Downloads</h3>
                     <p className="text-3xl font-bold text-spindeck-red">{stats.totalDownloads}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Plan Information */}
+              {planInfo && (
+                <div className="bg-gradient-to-r from-spindeck-red/10 to-red-700/10 rounded-lg p-6 border border-spindeck-red/20 mb-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        Current Plan: <span className="text-spindeck-red">{planInfo.name}</span>
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-spindeck-gray">Monthly Tracks:</span>
+                          <span className="ml-2 font-medium">
+                            {planInfo.features?.tracks_per_month === "unlimited" 
+                              ? "Unlimited" 
+                              : planInfo.features?.tracks_per_month || 0}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-spindeck-gray">Email Blasts:</span>
+                          <span className="ml-2 font-medium">
+                            {planInfo.features?.email_blasts === "unlimited" 
+                              ? "Unlimited" 
+                              : planInfo.features?.email_blasts || 0}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-spindeck-gray">Analytics:</span>
+                          <span className="ml-2 font-medium">
+                            {planInfo.features?.analytics ? "✅ Enabled" : "❌ Disabled"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {planInfo.name === "Free" ? (
+                        <Link href="/pricing" className="btn btn-primary bg-spindeck-red hover:bg-red-600 border-none">
+                          Upgrade Plan
+                        </Link>
+                      ) : (
+                        <div>
+                          <p className="text-2xl font-bold text-spindeck-red">${planInfo.price}</p>
+                          <p className="text-sm text-spindeck-gray">
+                            {planInfo.features?.duration === "one_time" ? "One-time" : "per month"}
+                          </p>
+                          <Link href="/pricing" className="btn btn-outline btn-sm mt-2 border-spindeck-red text-spindeck-red hover:bg-spindeck-red hover:text-white">
+                            Manage Plan
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Usage indicators */}
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Tracks Used This Month</span>
+                        <span>{stats.totalTracks} / {planInfo.features?.tracks_per_month === "unlimited" ? "∞" : planInfo.features?.tracks_per_month || 0}</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-spindeck-red h-2 rounded-full" 
+                          style={{
+                            width: planInfo.features?.tracks_per_month === "unlimited" 
+                              ? "0%" 
+                              : `${Math.min(100, (stats.totalTracks / (planInfo.features?.tracks_per_month || 1)) * 100)}%`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Plan Status</span>
+                        <span className="text-green-500">Active</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full w-full"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

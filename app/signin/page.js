@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/libs/supabase/client";
 import toast from "react-hot-toast";
 import config from "@/config";
@@ -10,9 +11,18 @@ import config from "@/config";
 // Successfull login redirects to /api/auth/callback where the Code Exchange is processed (see app/api/auth/callback/route.js).
 export default function Login() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
+  const [selectedRole, setSelectedRole] = useState("artist");
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam && ['artist', 'dj'].includes(roleParam)) {
+      setSelectedRole(roleParam);
+    }
+  }, [searchParams]);
 
   const handleSignup = async (e, options) => {
     e?.preventDefault();
@@ -21,7 +31,7 @@ export default function Login() {
 
     try {
       const { type, provider } = options;
-      const redirectURL = window.location.origin + "/api/auth/callback";
+      const redirectURL = window.location.origin + "/api/auth/callback" + `?role=${selectedRole}`;
 
       if (type === "oauth") {
         await supabase.auth.signInWithOAuth({
@@ -35,6 +45,9 @@ export default function Login() {
           email,
           options: {
             emailRedirectTo: redirectURL,
+            data: {
+              role: selectedRole
+            }
           },
         });
 
@@ -68,11 +81,32 @@ export default function Login() {
           Home
         </Link>
       </div>
-      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-12">
+      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-8">
         Sign-in to {config.appName}{" "}
       </h1>
 
       <div className="space-y-8 max-w-xl mx-auto">
+        {/* Role Selection */}
+        <div className="bg-base-200 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4 text-center">I am a...</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('artist')}
+              className={`btn ${selectedRole === 'artist' ? 'btn-primary' : 'btn-outline'}`}
+            >
+              🎵 Artist
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('dj')}
+              className={`btn ${selectedRole === 'dj' ? 'btn-primary' : 'btn-outline'}`}
+            >
+              🎧 DJ
+            </button>
+            {/* Admin role removed - auto-assigned based on email */}
+          </div>
+        </div>
         <button
           className="btn btn-block"
           onClick={(e) =>

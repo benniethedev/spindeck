@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import ButtonSignin from "@/components/ButtonSignin";
 import SpinDeckPricing from "@/components/SpinDeckPricing";
 import config from "@/config";

@@ -18,11 +18,8 @@ CREATE TABLE plans (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
--- Extend auth.users with custom fields
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS role user_role DEFAULT 'artist';
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS plan_id UUID REFERENCES plans(id);
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255);
-ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS stripe_subscription_id VARCHAR(255);
+-- Note: We don't modify auth.users directly in Supabase
+-- All custom fields are handled in the profiles table
 
 -- Create profiles table to store additional user data
 CREATE TABLE profiles (
@@ -240,8 +237,8 @@ CREATE POLICY "Users can view their download history" ON downloads
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO profiles (id, role)
-    VALUES (NEW.id, COALESCE(NEW.role, 'artist'));
+    INSERT INTO public.profiles (id, role)
+    VALUES (NEW.id, 'artist');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

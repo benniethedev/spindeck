@@ -57,39 +57,93 @@ const TOS = () => {
           className="leading-relaxed whitespace-pre-wrap"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: September 26, 2023
+          {`Last Updated: December 22, 2024
 
-Welcome to ShipFast!
+Welcome to SpinDeck!
 
-These Terms of Service ("Terms") govern your use of the ShipFast website at https://shipfa.st ("Website") and the services provided by ShipFast. By using our Website and services, you agree to these Terms.
+These Terms of Service ("Terms") govern your use of the SpinDeck website at https://spindeck.com ("Website") and the services provided by SpinDeck, a subsidiary of NetSwagger LLC. By using our Website and services, you agree to these Terms.
 
-1. Description of ShipFast
+1. Description of SpinDeck
 
-ShipFast is a platform that offers a JavaScript code boilerplate to assist entrepreneurs in launching their startups more efficiently.
+SpinDeck is a multi-genre record pool and music promotion platform that connects artists, DJs, and labels worldwide. We provide services including music distribution, promotional campaigns, DJ pool access, and analytics.
 
-2. Ownership and Usage Rights
+2. User Accounts and Roles
 
-When you purchase a package from ShipFast, you gain the right to download and use the code provided for creating applications. You own the code you create but do not have the right to resell it. We offer a full refund within 7 days of purchase, as specified in our refund policy.
+SpinDeck offers three types of user accounts:
+- Artists: Upload and promote music tracks
+- DJs: Access and download music from our record pool
+- Admins: Manage platform operations and content approval
 
-3. User Data and Privacy
+Each user type has specific rights and responsibilities as outlined in their respective dashboard areas.
 
-We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://shipfa.st/privacy-policy.
+3. Content and Intellectual Property
 
-4. Non-Personal Data Collection
+- Artists retain ownership of their original music content
+- By uploading content, artists grant SpinDeck a non-exclusive license to distribute and promote their music
+- Users may not upload content that infringes on third-party intellectual property rights
+- SpinDeck reserves the right to remove content that violates our guidelines
 
-We use web cookies to collect non-personal data for the purpose of improving our services and user experience.
+4. Subscription and Payment Terms
 
-5. Governing Law
+- Subscription plans are billed monthly or as one-time payments as specified
+- All payments are processed securely through Stripe
+- Refunds are handled according to our refund policy (7 days for subscription plans)
+- Subscription renewals are automatic unless cancelled
 
-These Terms are governed by the laws of France.
+5. DJ Pool and Downloads
 
-6. Updates to the Terms
+- DJs must maintain active accounts to access downloads
+- Downloaded content is for professional DJ use only
+- Redistribution or resale of downloaded content is prohibited
+- Download limits may apply based on subscription tier
 
-We may update these Terms from time to time. Users will be notified of any changes via email.
+6. User Data and Privacy
 
-For any questions or concerns regarding these Terms of Service, please contact us at marc@shipfa.st.
+We collect user data including name, email, payment information, and usage analytics to provide our services. For complete details on data handling, please refer to our Privacy Policy at https://spindeck.com/privacy-policy.
 
-Thank you for using ShipFast!`}
+7. Content Moderation and Approval
+
+- All uploaded tracks are subject to review and approval
+- SpinDeck reserves the right to reject content that doesn't meet our quality standards
+- Users will be notified of approval decisions via email
+
+8. Prohibited Activities
+
+Users may not:
+- Upload illegal, offensive, or copyrighted content without permission
+- Circumvent our security measures or access restrictions
+- Create multiple accounts to bypass usage limits
+- Use the platform for spam or unsolicited communications
+
+9. Platform Availability
+
+While we strive for 99.9% uptime, SpinDeck does not guarantee uninterrupted service availability. Maintenance windows and technical issues may temporarily affect access.
+
+10. Termination
+
+SpinDeck may terminate accounts for violations of these Terms. Users may cancel their accounts at any time through their account settings.
+
+11. Limitation of Liability
+
+SpinDeck's liability is limited to the amount paid for services in the preceding 12 months. We are not liable for indirect, incidental, or consequential damages.
+
+12. Governing Law
+
+These Terms are governed by the laws of the United States. Any disputes will be resolved in courts within the United States.
+
+13. Updates to Terms
+
+We may update these Terms periodically. Users will be notified of material changes via email and through platform notifications.
+
+14. Contact Information
+
+For questions regarding these Terms of Service, please contact us at:
+- Email: support@spindeck.com
+- Website: https://spindeck.com/contact
+
+SpinDeck is operated by NetSwagger LLC. Visit https://netswagger.com for more information about our parent company.
+
+Thank you for using SpinDeck!`}
         </pre>
       </div>
     </main>
