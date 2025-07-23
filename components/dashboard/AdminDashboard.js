@@ -9,10 +9,13 @@ import UserManagement from "./UserManagement";
 import TrackApproval from "./TrackApproval";
 import EmailBlastManager from "./EmailBlastManager";
 import AdminAnalytics from "./AdminAnalytics";
+import ArtistDashboard from "./ArtistDashboard";
+import DJDashboard from "./DJDashboard";
 import toast from "react-hot-toast";
 
-export default function AdminDashboard({ user, profile }) {
+export default function AdminDashboard({ user, profile, isPreviewOnly = false, previewRole = null }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [viewAsRole, setViewAsRole] = useState("admin");
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalArtists: 0,
@@ -84,6 +87,62 @@ export default function AdminDashboard({ user, profile }) {
     { id: "analytics", label: "Analytics", icon: "📈" },
   ];
 
+  // If viewing as another role, render that dashboard
+  if (viewAsRole === 'artist' && !isPreviewOnly) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        {/* Admin Preview Header */}
+        <div className="bg-yellow-500/20 border-b border-yellow-500/50 text-yellow-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="font-medium">Admin Preview Mode:</span>
+              <span>Viewing as <strong className="text-yellow-300">Artist</strong></span>
+            </div>
+            <button
+              onClick={() => setViewAsRole('admin')}
+              className="text-sm underline hover:text-yellow-100 transition-colors"
+            >
+              Back to Admin Dashboard
+            </button>
+          </div>
+        </div>
+        {/* Artist Dashboard */}
+        <ArtistDashboard user={user} profile={{ ...profile, role: 'artist' }} />
+      </div>
+    );
+  }
+  
+  if (viewAsRole === 'dj' && !isPreviewOnly) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        {/* Admin Preview Header */}
+        <div className="bg-yellow-500/20 border-b border-yellow-500/50 text-yellow-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="font-medium">Admin Preview Mode:</span>
+              <span>Viewing as <strong className="text-yellow-300">DJ</strong></span>
+            </div>
+            <button
+              onClick={() => setViewAsRole('admin')}
+              className="text-sm underline hover:text-yellow-100 transition-colors"
+            >
+              Back to Admin Dashboard
+            </button>
+          </div>
+        </div>
+        {/* DJ Dashboard */}
+        <DJDashboard user={user} profile={{ ...profile, role: 'dj' }} />
+      </div>
+    );
+  }
+
+  // Otherwise, render the admin dashboard
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -102,8 +161,30 @@ export default function AdminDashboard({ user, profile }) {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="px-2 py-1 bg-spindeck-red text-xs font-medium rounded-full">
-                ADMIN
+              {/* Role Switcher Dropdown */}
+              <div className="relative">
+                <select
+                  value={viewAsRole}
+                  onChange={(e) => setViewAsRole(e.target.value)}
+                  className="px-4 py-2 bg-spindeck-dark border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-spindeck-red appearance-none pr-8"
+                >
+                  <option value="admin">View as: Admin</option>
+                  <option value="artist">View as: Artist</option>
+                  <option value="dj">View as: DJ</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-spindeck-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                viewAsRole === 'admin' ? 'bg-spindeck-red' : 
+                viewAsRole === 'artist' ? 'bg-purple-600' : 
+                'bg-green-600'
+              }`}>
+                {viewAsRole.toUpperCase()}
               </span>
               <span className="text-sm text-spindeck-gray">
                 {profile?.full_name || user.email}

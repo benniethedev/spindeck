@@ -57,6 +57,19 @@ export default function Page() {
       <main className="bg-black text-white">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src="/hero.png"
+              alt="SpinDeck Hero Background"
+              fill
+              className="object-cover"
+              priority
+              quality={100}
+            />
+          </div>
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-black/50"></div>
           <div className="absolute inset-0 bg-gradient-to-br from-spindeck-red/20 to-transparent"></div>
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
@@ -176,18 +189,20 @@ export default function Page() {
               </div>
               
               <div className="relative">
-                <div className="aspect-video bg-gradient-to-br from-spindeck-red/20 to-spindeck-dark rounded-lg overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-32 h-32 bg-spindeck-red rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <p className="text-spindeck-gray">Watch Demo Video</p>
-                    </div>
+                <div className="space-y-4">
+                  <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
+                    <Image
+                      src="/screenshot.png"
+                      alt="SpinDeck Dashboard Screenshot"
+                      width={1200}
+                      height={675}
+                      className="w-full h-full object-cover"
+                      quality={100}
+                    />
                   </div>
+                  <p className="text-center text-spindeck-gray text-sm">
+                    SpinDeck Artist Dashboard - Track your music's performance in real-time
+                  </p>
                 </div>
               </div>
             </div>
@@ -195,8 +210,20 @@ export default function Page() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-spindeck-red to-red-700">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <section className="relative py-20 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src="/CTA.png"
+              alt="CTA Background"
+              fill
+              className="object-cover object-top"
+              quality={100}
+            />
+          </div>
+          {/* Red Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-spindeck-red/80 to-red-700/80"></div>
+          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Ready to Take Your Music to the Next Level?
             </h2>
