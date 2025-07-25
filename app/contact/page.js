@@ -6,7 +6,7 @@ import { getSEOTags } from "@/libs/seo";
 
 export const metadata = getSEOTags({
   title: `Contact | ${config.appName}`,
-  description: "Get in touch with SpinDeck. We're here to help with your music promotion needs.",
+  description: "Get in touch with SpinRec. We're here to help with your music promotion needs.",
   canonicalUrlRelative: "/contact",
 });
 
@@ -22,7 +22,7 @@ export default function ContactPage() {
               Get In <span className="text-spindeck-red">Touch</span>
             </h1>
             <p className="text-xl text-spindeck-gray max-w-2xl mx-auto">
-              Have questions about SpinDeck? Want to learn more about our services? We're here to help.
+              Have questions about SpinRec? Want to learn more about our services? We're here to help.
             </p>
           </div>
 
@@ -127,7 +127,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email Support</h3>
-                      <p className="text-spindeck-gray">support@spindeck.com</p>
+                      <p className="text-spindeck-gray">support@spinrec.com</p>
                       <p className="text-sm text-spindeck-gray">We typically respond within 24 hours</p>
                     </div>
                   </div>
@@ -186,8 +186,8 @@ export default function ContactPage() {
                 <p className="text-spindeck-gray mb-3">
                   Press releases, interviews, and media partnerships:
                 </p>
-                <a href="mailto:media@spindeck.com" className="text-spindeck-red hover:text-red-400 transition">
-                  media@spindeck.com
+                <a href="mailto:media@spinrec.com" className="text-spindeck-red hover:text-red-400 transition">
+                  media@spinrec.com
                 </a>
               </div>
             </div>

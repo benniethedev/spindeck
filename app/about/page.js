@@ -7,7 +7,7 @@ import { getSEOTags } from "@/libs/seo";
 
 export const metadata = getSEOTags({
   title: `About | ${config.appName}`,
-  description: "Learn about SpinDeck's mission to democratize music industry access and meet founder Leonard Madu.",
+  description: "Learn about SpinRec's mission to democratize music industry access and meet founder Leonard Madu.",
   canonicalUrlRelative: "/about",
 });
 
@@ -23,7 +23,7 @@ export default function AboutPage() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                About <span className="text-spindeck-red">SpinDeck</span>
+                About <span className="text-spindeck-red">SpinRec</span>
               </h1>
               <p className="text-xl text-spindeck-gray max-w-3xl mx-auto">
                 Where real music industry access meets cutting-edge technology
@@ -40,7 +40,7 @@ export default function AboutPage() {
                 <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-spindeck-red/20 to-transparent p-1">
                   <Image
                     src="/madu.png"
-                    alt="Leonard Madu - Founder & CEO of SpinDeck"
+                    alt="Leonard Madu - Founder & CEO of SpinRec"
                     width={600}
                     height={600}
                     className="w-full h-full object-cover rounded-lg"
@@ -65,7 +65,7 @@ export default function AboutPage() {
                 <p className="text-lg text-spindeck-gray leading-relaxed">
                   He sharpened his skills in New York through Digiwaxx, Voxonic, and J Records, running promotions 
                   for both major and independent acts. Today, he leads The Madu Group, co-founded the label A.N.D, 
-                  and brings his decades of industry expertise to SpinDeck with backing from 
+                  and brings his decades of industry expertise to SpinRec with backing from 
                   <span className="text-white font-medium"> Empire</span> and 
                   <span className="text-white font-medium"> Sparta Distribution</span>.
                 </p>
@@ -92,21 +92,21 @@ export default function AboutPage() {
         <section className="py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              The <span className="text-spindeck-red">SpinDeck</span> Story
+              The <span className="text-spindeck-red">SpinRec</span> Story
             </h2>
             
             <div className="space-y-8 text-lg text-spindeck-gray leading-relaxed">
               <p>
-                SpinDeck is a next-generation music promotion and DJ record pool platform founded by Leonard Madu, 
+                SpinRec is a next-generation music promotion and DJ record pool platform founded by Leonard Madu, 
                 a seasoned industry executive with deep roots in hip-hop, R&B, and urban music culture. With decades 
-                of experience in radio promotions, tour management, and industry rollouts, Madu created SpinDeck to 
+                of experience in radio promotions, tour management, and industry rollouts, Madu created SpinRec to 
                 bridge the gap between emerging artists and the decision-makers who move the culture.
               </p>
               
               <p>
-                SpinDeck empowers independent artists, DJs, and labels by offering powerful tools for music distribution, 
+                SpinRec empowers independent artists, DJs, and labels by offering powerful tools for music distribution, 
                 promotional email blasts, mixtape servicing, and strategic exposure. Whether you're an artist looking 
-                to get your latest single heard by 65,000+ DJs or a label ready to launch a full campaign, SpinDeck 
+                to get your latest single heard by 65,000+ DJs or a label ready to launch a full campaign, SpinRec 
                 delivers real industry access — <span className="text-white font-medium">no gatekeeping, just growth</span>.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function AboutPage() {
               </h2>
               <div className="max-w-3xl mx-auto space-y-6">
                 <p className="text-xl text-spindeck-gray leading-relaxed">
-                  SpinDeck exists to make real music industry promotion accessible and transparent.
+                  SpinRec exists to make real music industry promotion accessible and transparent.
                 </p>
                 <p className="text-lg text-spindeck-gray leading-relaxed">
                   We don't just upload tracks — we push records into real DJ sets, playlists, radio rotations, 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
 import config from "@/config";
@@ -67,6 +68,20 @@ export default function DJPoolPage() {
       <main className="bg-black text-white pt-20">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src="/record.png"
+              alt="Vinyl Records Background"
+              fill
+              className="object-cover"
+              priority
+              quality={100}
+            />
+          </div>
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/60"></div>
+          {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-spindeck-red/20 to-transparent"></div>
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
@@ -248,7 +263,7 @@ export default function DJPoolPage() {
                   </div>
                 </div>
                 <p className="text-spindeck-gray">
-                  "SpinDeck has the freshest tracks before anyone else. My sets always stand out because of the exclusive music I get here."
+                  "SpinRec has the freshest tracks before anyone else. My sets always stand out because of the exclusive music I get here."
                 </p>
               </div>
               
@@ -292,7 +307,7 @@ export default function DJPoolPage() {
               Ready to Elevate Your Sets?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join thousands of DJs who trust SpinDeck for the freshest music.
+              Join thousands of DJs who trust SpinRec for the freshest music.
             </p>
             <Link href="/signin?role=dj" className="btn btn-lg bg-black hover:bg-gray-900 text-white border-none">
               Access DJ Pool Now

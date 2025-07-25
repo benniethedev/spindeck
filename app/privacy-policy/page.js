@@ -27,7 +27,7 @@ import config from "@/config";
 
 export const metadata = getSEOTags({
   title: `Privacy Policy | ${config.appName}`,
-  description: "SpinDeck's privacy policy. Learn how we collect, use, and protect your personal information and music data.",
+  description: "SpinRec's privacy policy. Learn how we collect, use, and protect your personal information and music data.",
   canonicalUrlRelative: "/privacy-policy",
 });
 
@@ -60,9 +60,9 @@ const PrivacyPolicy = () => {
         >
           {`Last Updated: December 22, 2024
 
-Thank you for using SpinDeck ("we," "us," or "our"). This Privacy Policy explains how we collect, use, and protect your information when you use our website at https://spindeck.com and our music platform services. SpinDeck is operated by NetSwagger LLC.
+Thank you for using SpinRec ("we," "us," or "our"). This Privacy Policy explains how we collect, use, and protect your information when you use our website at https://spinrec.com and our music platform services. SpinRec is operated by NetSwagger LLC.
 
-By using SpinDeck, you agree to the collection and use of information in accordance with this Privacy Policy.
+By using SpinRec, you agree to the collection and use of information in accordance with this Privacy Policy.
 
 1. Information We Collect
 
@@ -146,7 +146,7 @@ We retain your information:
 
 7. Children's Privacy
 
-SpinDeck is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will take steps to delete it promptly.
+SpinRec is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will take steps to delete it promptly.
 
 8. International Data Transfers
 
@@ -154,7 +154,7 @@ Your information may be transferred to and processed in countries other than you
 
 9. Third-Party Services
 
-SpinDeck integrates with third-party services:
+SpinRec integrates with third-party services:
 
 - Supabase: Database and authentication services
 - Stripe: Payment processing
@@ -182,24 +182,24 @@ We may update this Privacy Policy periodically. We will notify users of material
 - Platform notifications and announcements
 - Updates posted on our website
 
-Continued use of SpinDeck after changes constitutes acceptance of the updated Privacy Policy.
+Continued use of SpinRec after changes constitutes acceptance of the updated Privacy Policy.
 
 12. Contact Information
 
 For questions about this Privacy Policy or data practices, contact us:
 
-Email: privacy@spindeck.com
-Support: support@spindeck.com
-Website: https://spindeck.com/contact
+Email: privacy@spinrec.com
+Support: support@spinrec.com
+Website: https://spinrec.com/contact
 
 Mailing Address:
 NetSwagger LLC
 Music Division - Privacy Office
 United States
 
-Data Protection Officer: privacy@spindeck.com
+Data Protection Officer: privacy@spinrec.com
 
-By using SpinDeck, you acknowledge that you have read and understood this Privacy Policy and agree to our data practices as described herein.`}
+By using SpinRec, you acknowledge that you have read and understood this Privacy Policy and agree to our data practices as described herein.`}
         </pre>
       </div>
     </main>

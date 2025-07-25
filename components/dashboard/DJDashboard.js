@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { createClient } from "@/libs/supabase/client";
 import ButtonAccount from "@/components/ButtonAccount";
+import BrandLogo from "@/components/BrandLogo";
 import AudioPlayer from "../AudioPlayer";
 import toast from "react-hot-toast";
 
@@ -192,15 +191,7 @@ export default function DJDashboard({ user, profile }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <Image
-                  src="/logo.png"
-                  alt="SpinDeck Logo"
-                  width={120}
-                  height={40}
-                  className="h-8 w-auto"
-                />
-              </Link>
+              <BrandLogo />
             </div>
             <div className="flex items-center space-x-4">
               <span className="px-2 py-1 bg-green-600 text-xs font-medium rounded-full">

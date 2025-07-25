@@ -61,7 +61,7 @@ export default function Page() {
           <div className="absolute inset-0">
             <Image
               src="/hero.png"
-              alt="SpinDeck Hero Background"
+              alt="SpinRec Hero Background"
               fill
               className="object-cover"
               priority
@@ -193,7 +193,7 @@ export default function Page() {
                   <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
                     <Image
                       src="/screenshot.png"
-                      alt="SpinDeck Dashboard Screenshot"
+                      alt="SpinRec Dashboard Screenshot"
                       width={1200}
                       height={675}
                       className="w-full h-full object-cover"
@@ -201,7 +201,7 @@ export default function Page() {
                     />
                   </div>
                   <p className="text-center text-spindeck-gray text-sm">
-                    SpinDeck Artist Dashboard - Track your music's performance in real-time
+                    SpinRec Artist Dashboard - Track your music's performance in real-time
                   </p>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function Page() {
               Ready to Take Your Music to the Next Level?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join thousands of artists who are already using SpinDeck to grow their careers.
+              Join thousands of artists who are already using SpinRec to grow their careers.
             </p>
             <Link href="/pricing" className="btn btn-lg bg-black hover:bg-gray-900 text-white border-none">
               Get Started Today

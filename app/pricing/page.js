@@ -1,6 +1,6 @@
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
-import SpinDeckPricing from "@/components/SpinDeckPricing";
+import SpinRecPricing from "@/components/SpinRecPricing";
 import config from "@/config";
 import { getSEOTags } from "@/libs/seo";
 
@@ -16,7 +16,7 @@ export default function PricingPage() {
       <PublicHeader />
 
       <main className="bg-black text-white pt-20">
-        <SpinDeckPricing />
+        <SpinRecPricing />
       </main>
 
       <PublicFooter />

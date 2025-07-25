@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import config from "@/config";
 
 export default function PublicFooter() {
@@ -9,13 +10,7 @@ export default function PublicFooter() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="mb-4">
-              <Image
-                src="/logo.png"
-                alt="SpinDeck Logo"
-                width={120}
-                height={40}
-                className="h-10 w-auto"
-              />
+              <BrandLogo />
             </div>
             <p className="text-spindeck-gray">Where Music Meets the Industry</p>
           </div>
@@ -50,7 +45,7 @@ export default function PublicFooter() {
         <div className="pt-8 border-t border-spindeck-dark text-center">
           <p className="text-spindeck-gray mb-2">© 2024 {config.appName}. All rights reserved.</p>
           <p className="text-sm text-spindeck-gray">
-            SpinDeck is a subsidiary of{" "}
+            SpinRec is a subsidiary of{" "}
             <a 
               href="https://netswagger.com" 
               target="_blank" 

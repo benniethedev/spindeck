@@ -81,7 +81,7 @@ export default async function AdminStatusPage() {
             <div className="bg-gray-900 p-4 rounded-lg">
               <pre className="text-sm text-green-400">
                 <code>{`# In your .env.local file:
-ADMIN_EMAILS=benbond@gmail.com,admin@spindeck.com,admin@netswagger.com`}</code>
+ADMIN_EMAILS=benbond@gmail.com,admin@spinrec.com,admin@netswagger.com`}</code>
               </pre>
             </div>
             <p className="text-sm text-spindeck-gray mt-2">
