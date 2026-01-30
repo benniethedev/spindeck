@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/libs/pressbase/client";
 import ButtonAccount from "@/components/ButtonAccount";
+import ButtonPortal from "@/components/ButtonPortal";
 import BrandLogo from "@/components/BrandLogo";
 import TrackUpload from "./TrackUpload";
 import TracksList from "./TracksList";
@@ -22,6 +23,7 @@ export default function ArtistDashboard({ user, profile }) {
   });
   const [loading, setLoading] = useState(true);
   const [planInfo, setPlanInfo] = useState(null);
+  const [customerId, setCustomerId] = useState(null);
 
   const pb = createClient();
 
@@ -99,12 +101,17 @@ export default function ArtistDashboard({ user, profile }) {
 
   const fetchPlanInfo = async () => {
     try {
-      // Get user's current plan
+      // Get user's current plan and customer_id for subscription management
       const { data: profile, error: profileError } = await pb
         .from("profiles")
-        .select("plan_id")
+        .select("plan_id, customer_id")
         .eq("id", user.id)
         .single();
+
+      // Store customer_id for Stripe portal access
+      if (profile?.customer_id) {
+        setCustomerId(profile.customer_id);
+      }
 
       if (profile?.plan_id) {
         // Get plan details
@@ -269,9 +276,19 @@ export default function ArtistDashboard({ user, profile }) {
                           <p className="text-sm text-spindeck-gray">
                             {planInfo.features?.duration === "one_time" ? "One-time" : "per month"}
                           </p>
-                          <Link href="/pricing" className="btn btn-outline btn-sm mt-2 border-spindeck-red text-spindeck-red hover:bg-spindeck-red hover:text-white">
-                            Manage Plan
-                          </Link>
+                          <div className="flex flex-col gap-2 mt-2">
+                            {/* Stripe Customer Portal for subscription management */}
+                            <ButtonPortal 
+                              customerId={customerId}
+                              className="btn-sm bg-spindeck-red hover:bg-red-600 text-white border-none"
+                            >
+                              Manage Subscription
+                            </ButtonPortal>
+                            {/* Fallback to pricing page if no customer_id or for plan comparison */}
+                            <Link href="/pricing" className="btn btn-outline btn-sm border-spindeck-red text-spindeck-red hover:bg-spindeck-red hover:text-white">
+                              View Plans
+                            </Link>
+                          </div>
                         </div>
                       )}
                     </div>
