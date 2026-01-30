@@ -20,11 +20,11 @@ export async function GET(req) {
       // Determine the correct role based on email and selection
       const finalRole = determineUserRole(user.email, role);
 
-      // Check if profile exists
+      // Check if profile exists (use owner_user_id - PressBase built-in field)
       const { data: existingProfile } = await pb
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("owner_user_id", user.id)
         .single();
 
       if (existingProfile) {
@@ -36,13 +36,13 @@ export async function GET(req) {
             full_name: user.user_metadata?.full_name || existingProfile.full_name,
             avatar_url: user.user_metadata?.avatar_url || existingProfile.avatar_url
           })
-          .eq("id", user.id);
+          .eq("owner_user_id", user.id);
       } else {
         // Create new profile with the determined role
+        // PressBase automatically sets owner_user_id when authenticated
         await pb
           .from("profiles")
           .insert({
-            id: user.id,
             role: finalRole,
             full_name: user.user_metadata?.full_name || null,
             avatar_url: user.user_metadata?.avatar_url || null

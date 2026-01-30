@@ -20,12 +20,12 @@ export default async function DJPoolBrowsePage() {
     data: { user },
   } = await pb.auth.getUser();
 
-  // If logged in as DJ, redirect to dashboard
+  // If logged in as DJ, redirect to dashboard (use owner_user_id - PressBase built-in)
   if (user) {
     const { data: profile } = await pb
       .from("profiles")
       .select("role")
-      .eq("id", user.id)
+      .eq("owner_user_id", user.id)
       .single();
 
     if (profile?.role === "dj" || profile?.role === "admin") {

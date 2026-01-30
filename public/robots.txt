@@ -1,9 +1,13 @@
 # *
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+Disallow: /checkout
 
 # Host
-Host: https://shipfa.st
+Host: https://spinrec.com
 
 # Sitemaps
-Sitemap: https://shipfa.st/sitemap.xml
+Sitemap: https://spinrec.com/sitemap.xml

@@ -115,14 +115,14 @@ export default function ArtistDashboard({ user, profile }) {
       const { data: profile, error: profileError } = await pb
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("owner_user_id", user.id)
         .single();
 
       if (profileError && profileError.code === 'PGRST116') {
+        // PressBase automatically sets owner_user_id when authenticated
         const { error: createError } = await pb
           .from("profiles")
           .insert([{ 
-            id: user.id, 
             role: 'artist',
             full_name: user.user_metadata?.full_name || null,
             avatar_url: user.user_metadata?.avatar_url || null
@@ -176,7 +176,7 @@ export default function ArtistDashboard({ user, profile }) {
       const { data: profile, error: profileError } = await pb
         .from("profiles")
         .select("plan_id, customer_id")
-        .eq("id", user.id)
+        .eq("owner_user_id", user.id)
         .single();
 
       if (profile?.customer_id) {

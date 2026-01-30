@@ -28,7 +28,7 @@ export async function POST(req) {
     const { data } = await pb
       .from("profiles")
       .select("*")
-      .eq("id", user?.id)
+      .eq("owner_user_id", user?.id)
       .single();
 
     if (!data?.customer_id) {

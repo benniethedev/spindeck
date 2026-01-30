@@ -127,7 +127,7 @@ export default function DJDashboard({ user, profile }) {
       const { data: userProfile, error } = await pb
         .from("profiles")
         .select("*, plans(*)")
-        .eq("id", user.id)
+        .eq("owner_user_id", user.id)
         .single();
 
       if (error) throw error;

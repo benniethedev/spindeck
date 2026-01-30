@@ -15,11 +15,11 @@ export async function GET(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
+    // Check if user is admin (use owner_user_id - PressBase built-in)
     const { data: profile } = await pb
       .from("profiles")
       .select("role")
-      .eq("id", user.id)
+      .eq("owner_user_id", user.id)
       .single();
 
     if (profile?.role !== "admin") {

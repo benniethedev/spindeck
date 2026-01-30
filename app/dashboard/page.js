@@ -18,21 +18,21 @@ export default async function Dashboard() {
     redirect("/signin");
   }
 
-  // Get user profile to determine role
+  // Get user profile to determine role (use owner_user_id - PressBase built-in)
   let { data: profile } = await pb
     .from("profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("owner_user_id", user.id)
     .single();
 
   if (!profile) {
     // Create profile if it doesn't exist with proper role determination
     const correctRole = determineUserRole(user.email, 'artist');
     
+    // PressBase automatically sets owner_user_id when authenticated
     const { data: newProfile } = await pb
       .from("profiles")
       .insert({
-        id: user.id,
         role: correctRole,
         full_name: user.user_metadata?.full_name || null,
         avatar_url: user.user_metadata?.avatar_url || null
@@ -53,14 +53,14 @@ export default async function Dashboard() {
       await pb
         .from("profiles")
         .update({ role: 'admin' })
-        .eq("id", user.id);
+        .eq("owner_user_id", user.id);
       profile.role = 'admin';
     } else if (!shouldBeAdmin && currentRole === 'admin') {
       // Remove admin access if email no longer in list
       await pb
         .from("profiles")
         .update({ role: 'artist' })
-        .eq("id", user.id);
+        .eq("owner_user_id", user.id);
       profile.role = 'artist';
     }
   }

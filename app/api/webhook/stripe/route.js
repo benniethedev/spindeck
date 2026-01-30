@@ -20,12 +20,12 @@ const findPlanByPriceId = (priceId) => {
 async function getOrCreateUserProfile(pb, { email, userId, customerId }) {
   let profile = null;
 
-  // Try to find by userId first (use user_id field)
+  // Try to find by userId first (use owner_user_id - PressBase built-in)
   if (userId) {
     const { data } = await pb
       .from("profiles")
       .select("*")
-      .eq("user_id", userId)
+      .eq("owner_user_id", userId)
       .single();
     if (data) profile = data;
   }
@@ -57,10 +57,11 @@ async function getOrCreateUserProfile(pb, { email, userId, customerId }) {
     });
     if (data?.user) {
       // Create the profile for the new user
+      // Note: For service-key created profiles, owner_user_id won't be set automatically
+      // We need to query by id after creation
       const { data: newProfile } = await pb
         .from("profiles")
         .insert({
-          user_id: data.user.id,
           role: 'artist',
         })
         .select()

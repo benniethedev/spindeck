@@ -31,11 +31,11 @@ export async function POST(request) {
       );
     }
 
-    // Get user profile to check subscription
+    // Get user profile to check subscription (use owner_user_id - PressBase built-in)
     const { data: profile, error: profileError } = await pb
       .from("profiles")
       .select("*, plans(*)")
-      .eq("id", user.id)
+      .eq("owner_user_id", user.id)
       .single();
 
     if (profileError) {
