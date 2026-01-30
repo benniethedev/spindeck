@@ -1,6 +1,7 @@
 import configFile from "@/config";
 import { findCheckoutSession } from "@/libs/stripe";
 import { createServiceClient } from "@/libs/pressbase/server";
+import { sendWelcomeEmail } from "@/libs/emails/subscription";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -19,12 +20,12 @@ const findPlanByPriceId = (priceId) => {
 async function getOrCreateUserProfile(pb, { email, userId, customerId }) {
   let profile = null;
 
-  // Try to find by userId first
+  // Try to find by userId first (use user_id field)
   if (userId) {
     const { data } = await pb
       .from("profiles")
       .select("*")
-      .eq("id", userId)
+      .eq("user_id", userId)
       .single();
     if (data) profile = data;
   }
@@ -55,11 +56,14 @@ async function getOrCreateUserProfile(pb, { email, userId, customerId }) {
       email: email,
     });
     if (data?.user) {
-      // Fetch the newly created profile
+      // Create the profile for the new user
       const { data: newProfile } = await pb
         .from("profiles")
-        .select("*")
-        .eq("id", data.user.id)
+        .insert({
+          user_id: data.user.id,
+          role: 'artist',
+        })
+        .select()
         .single();
       profile = newProfile;
     }
@@ -140,6 +144,20 @@ export async function POST(req) {
         }
 
         await pb.from("profiles").update(updateData).eq("id", profile.id);
+
+        // Send welcome email to new subscriber
+        try {
+          await sendWelcomeEmail({
+            email,
+            name: profile.full_name || null,
+            planName: plan.name,
+            features: plan.features || [],
+          });
+          console.log(`📧 Welcome email sent to ${email}`);
+        } catch (emailError) {
+          // Log but don't fail the webhook if email fails
+          console.error(`Failed to send welcome email to ${email}:`, emailError.message);
+        }
 
         console.log(
           `✅ checkout.session.completed: User ${profile.id} subscribed to ${plan.name}`
