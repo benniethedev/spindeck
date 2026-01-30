@@ -18,9 +18,10 @@ const config = {
     // Create multiple plans in your Stripe dashboard, then add them here. You can add as many plans as you want, just make sure to add the priceId
     plans: [
       {
+        // Test: price_1Sv5P52RSmrbs0ADrAupJ0zy | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_basic_dev"
+            ? "price_1Sv5P52RSmrbs0ADrAupJ0zy"
             : "price_spindeck_basic_prod",
         name: "Basic",
         description: "Perfect for new artists starting out",
@@ -34,9 +35,10 @@ const config = {
         ],
       },
       {
+        // Test: price_1Sv5P62RSmrbs0ADMQ6IUwdw | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_silver_dev"
+            ? "price_1Sv5P62RSmrbs0ADMQ6IUwdw"
             : "price_spindeck_silver_prod",
         name: "Silver",
         description: "Growing artists ready to expand",
@@ -52,9 +54,10 @@ const config = {
       },
       {
         isFeatured: true,
+        // Test: price_1Sv5P72RSmrbs0ADqHH8GjVh | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_gold_dev"
+            ? "price_1Sv5P72RSmrbs0ADqHH8GjVh"
             : "price_spindeck_gold_prod",
         name: "Gold",
         description: "Professional artists & labels",
@@ -70,9 +73,10 @@ const config = {
         ],
       },
       {
+        // Test: price_1Sv5P72RSmrbs0ADHS2x4OsE | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_platinum_dev"
+            ? "price_1Sv5P72RSmrbs0ADHS2x4OsE"
             : "price_spindeck_platinum_prod",
         name: "Platinum",
         description: "Elite labels & management",
@@ -88,9 +92,10 @@ const config = {
         ],
       },
       {
+        // Test: price_1Sv5P82RSmrbs0ADwPkrTBTs | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_mixtape_dev"
+            ? "price_1Sv5P82RSmrbs0ADwPkrTBTs"
             : "price_spindeck_mixtape_prod",
         name: "Mixtape",
         description: "One-time mixtape promotion",
@@ -105,9 +110,10 @@ const config = {
         ],
       },
       {
+        // Test: price_1Sv5P92RSmrbs0AD9AFS3WPL | Prod: TBD
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_spindeck_newsletter_dev"
+            ? "price_1Sv5P92RSmrbs0AD9AFS3WPL"
             : "price_spindeck_newsletter_prod",
         name: "Newsletter",
         description: "Mass email promotion",
