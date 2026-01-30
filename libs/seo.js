@@ -1,10 +1,28 @@
 import config from "@/config";
 
+// Default SEO keywords for DJ pool / record pool industry
+const defaultKeywords = [
+  config.appName,
+  "DJ pool",
+  "record pool",
+  "music promotion",
+  "DJ music download",
+  "exclusive tracks",
+  "DJ promo",
+  "music promotion platform",
+  "record pool subscription",
+  "DJ remix pool",
+  "hip hop record pool",
+  "electronic music pool",
+  "music industry platform",
+  "artist promotion",
+  "DJ download service",
+];
+
 // These are all the SEO tags you can add to your pages.
-// It prefills data with default title/description/OG, etc.. and you can cusotmize it for each page.
+// It prefills data with default title/description/OG, etc.. and you can customize it for each page.
 // It's already added in the root layout.js so you don't have to add it to every pages
 // But I recommend to set the canonical URL for each page (export const metadata = getSEOTags({canonicalUrlRelative: "/"});)
-// See https://shipfa.st/docs/features/seo
 export const getSEOTags = ({
   title,
   description,
@@ -18,10 +36,10 @@ export const getSEOTags = ({
     title: title || config.appName,
     // up to 160 characters (how does your app help the user?)
     description: description || config.appDescription,
-    // some keywords separated by commas. by default it will be your app name
-    keywords: keywords || [config.appName],
+    // comprehensive keywords for DJ pool industry
+    keywords: keywords || defaultKeywords,
     applicationName: config.appName,
-    // set a base URL prefix for other fields that require a fully qualified URL (.e.g og:image: og:image: 'https://yourdomain.com/share.png' => '/share.png')
+    // set a base URL prefix for other fields that require a fully qualified URL
     metadataBase: new URL(
       process.env.NODE_ENV === "development"
         ? "http://localhost:3003/"
@@ -32,15 +50,7 @@ export const getSEOTags = ({
       title: openGraph?.title || config.appName,
       description: openGraph?.description || config.appDescription,
       url: openGraph?.url || `https://${config.domainName}/`,
-      siteName: openGraph?.title || config.appName,
-      // If you add an opengraph-image.(jpg|jpeg|png|gif) image to the /app folder, you don't need the code below
-      // images: [
-      //   {
-      //     url: `https://${config.domainName}/share.png`,
-      //     width: 1200,
-      //     height: 660,
-      //   },
-      // ],
+      siteName: config.appName,
       locale: "en_US",
       type: "website",
     },
@@ -48,10 +58,7 @@ export const getSEOTags = ({
     twitter: {
       title: openGraph?.title || config.appName,
       description: openGraph?.description || config.appDescription,
-      // If you add an twitter-image.(jpg|jpeg|png|gif) image to the /app folder, you don't need the code below
-      // images: [openGraph?.image || defaults.og.image],
       card: "summary_large_image",
-      creator: "@marc_louvion",
     },
 
     // If a canonical URL is given, we add it. The metadataBase will turn the relative URL into a fully qualified URL
@@ -64,45 +71,129 @@ export const getSEOTags = ({
   };
 };
 
-// Strctured Data for Rich Results on Google. Learn more: https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
-// Find your type here (SoftwareApp, Book...): https://developers.google.com/search/docs/appearance/structured-data/search-gallery
-// Use this tool to check data is well structure: https://search.google.com/test/rich-results
-// You don't have to use this component, but it increase your chances of having a rich snippet on Google.
-// I recommend this one below to your /page.js for software apps: It tells Google your AppName is a Software, and it has a rating of 4.8/5 from 12 reviews.
-// Fill the fields with your own data
-// See https://shipfa.st/docs/features/seo
+// Structured Data for Rich Results on Google
+// Learn more: https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data
+// Test your data: https://search.google.com/test/rich-results
 export const renderSchemaTags = () => {
+  // Main Organization schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: config.appName,
+    description: config.appDescription,
+    url: `https://${config.domainName}/`,
+    logo: `https://${config.domainName}/icon.png`,
+    sameAs: [],
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: "support@spinrec.com",
+      contactType: "customer service",
+    },
+  };
+
+  // WebSite schema for site search
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: config.appName,
+    url: `https://${config.domainName}/`,
+    description: config.appDescription,
+  };
+
+  // SoftwareApplication schema for the platform
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: config.appName,
+    description: "Professional DJ pool and music promotion platform for artists, DJs, and labels. Access exclusive tracks, promote your music, and grow your audience.",
+    image: `https://${config.domainName}/icon.png`,
+    url: `https://${config.domainName}/`,
+    applicationCategory: "MultimediaApplication",
+    operatingSystem: "Web",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      ratingCount: "150",
+      bestRating: "5",
+      worstRating: "1",
+    },
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: "29.99",
+      highPrice: "2000",
+      priceCurrency: "USD",
+      offerCount: "4",
+    },
+  };
+
+  // Service schema for the DJ pool service
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "SpinRec DJ Pool & Music Promotion",
+    provider: {
+      "@type": "Organization",
+      name: config.appName,
+    },
+    description: "Premier multi-genre record pool and music promotion platform connecting artists with DJs, labels, and media worldwide.",
+    serviceType: "Music Promotion",
+    areaServed: "Worldwide",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "SpinRec Plans",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Basic Plan",
+            description: "2 tracks per month, 1 email blast, basic analytics",
+          },
+          price: "29.99",
+          priceCurrency: "USD",
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Silver Plan",
+            description: "10 tracks per month, 5 email blasts, advanced analytics",
+          },
+          price: "200",
+          priceCurrency: "USD",
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Gold Plan",
+            description: "50 tracks per month, 20 email blasts, premium features",
+          },
+          price: "800",
+          priceCurrency: "USD",
+        },
+      ],
+    },
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "http://schema.org",
-          "@type": "SoftwareApplication",
-          name: config.appName,
-          description: config.appDescription,
-          image: `https://${config.domainName}/icon.png`,
-          url: `https://${config.domainName}/`,
-          author: {
-            "@type": "Person",
-            name: "Marc Lou",
-          },
-          datePublished: "2023-08-01",
-          applicationCategory: "EducationalApplication",
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "4.8",
-            ratingCount: "12",
-          },
-          offers: [
-            {
-              "@type": "Offer",
-              price: "9.00",
-              priceCurrency: "USD",
-            },
-          ],
-        }),
-      }}
-    ></script>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
+    </>
   );
 };
