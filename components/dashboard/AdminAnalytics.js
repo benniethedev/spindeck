@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 
 export default function AdminAnalytics() {
@@ -18,7 +18,7 @@ export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("30");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchAnalytics();
@@ -31,7 +31,7 @@ export default function AdminAnalytics() {
       startDate.setDate(startDate.getDate() - parseInt(timeRange));
 
       // Fetch all analytics data
-      const { data: analyticsData, error: analyticsError } = await supabase
+      const { data: analyticsData, error: analyticsError } = await pb
         .from("analytics")
         .select("*")
         .gte("timestamp", startDate.toISOString())
@@ -40,7 +40,7 @@ export default function AdminAnalytics() {
       if (analyticsError) throw analyticsError;
 
       // Fetch tracks with user info
-      const { data: tracks, error: tracksError } = await supabase
+      const { data: tracks, error: tracksError } = await pb
         .from("tracks")
         .select(`
           *,
@@ -53,7 +53,7 @@ export default function AdminAnalytics() {
       if (tracksError) throw tracksError;
 
       // Fetch user growth data
-      const { data: users, error: usersError } = await supabase
+      const { data: users, error: usersError } = await pb
         .from("profiles")
         .select("created_at, role")
         .gte("created_at", startDate.toISOString())

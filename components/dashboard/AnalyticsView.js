@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 
 export default function AnalyticsView({ userId }) {
@@ -16,7 +16,7 @@ export default function AnalyticsView({ userId }) {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("30");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchAnalytics();
@@ -29,7 +29,7 @@ export default function AnalyticsView({ userId }) {
       startDate.setDate(startDate.getDate() - parseInt(timeRange));
 
       // Fetch tracks for this user
-      const { data: tracks, error: tracksError } = await supabase
+      const { data: tracks, error: tracksError } = await pb
         .from("tracks")
         .select("id, title, artist_name, play_count, download_count")
         .eq("user_id", userId);
@@ -39,7 +39,7 @@ export default function AnalyticsView({ userId }) {
       const trackIds = tracks?.map(track => track.id) || [];
 
       // Fetch analytics data
-      const { data: analyticsData, error: analyticsError } = await supabase
+      const { data: analyticsData, error: analyticsError } = await pb
         .from("analytics")
         .select("*")
         .in("track_id", trackIds)

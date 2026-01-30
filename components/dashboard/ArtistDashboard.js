@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import ButtonAccount from "@/components/ButtonAccount";
 import BrandLogo from "@/components/BrandLogo";
 import TrackUpload from "./TrackUpload";
@@ -23,7 +23,7 @@ export default function ArtistDashboard({ user, profile }) {
   const [loading, setLoading] = useState(true);
   const [planInfo, setPlanInfo] = useState(null);
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchStats();
@@ -33,7 +33,7 @@ export default function ArtistDashboard({ user, profile }) {
   const fetchStats = async () => {
     try {
       // First ensure user has a profile
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await pb
         .from("profiles")
         .select("*")
         .eq("id", user.id)
@@ -41,7 +41,7 @@ export default function ArtistDashboard({ user, profile }) {
 
       if (profileError && profileError.code === 'PGRST116') {
         // Profile doesn't exist, create it
-        const { error: createError } = await supabase
+        const { error: createError } = await pb
           .from("profiles")
           .insert([{ 
             id: user.id, 
@@ -56,7 +56,7 @@ export default function ArtistDashboard({ user, profile }) {
       }
 
       // Fetch track stats
-      const { data: tracks, error: tracksError } = await supabase
+      const { data: tracks, error: tracksError } = await pb
         .from("tracks")
         .select("status, play_count, download_count")
         .eq("user_id", user.id);
@@ -100,7 +100,7 @@ export default function ArtistDashboard({ user, profile }) {
   const fetchPlanInfo = async () => {
     try {
       // Get user's current plan
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await pb
         .from("profiles")
         .select("plan_id")
         .eq("id", user.id)
@@ -108,7 +108,7 @@ export default function ArtistDashboard({ user, profile }) {
 
       if (profile?.plan_id) {
         // Get plan details
-        const { data: plan, error: planError } = await supabase
+        const { data: plan, error: planError } = await pb
           .from("plans")
           .select("*")
           .eq("id", profile.plan_id)

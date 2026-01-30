@@ -1,4 +1,4 @@
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
 
 // This route is used to store the leads that are generated from the landing page.
@@ -15,8 +15,8 @@ export async function POST(req) {
     // For instance, sending a welcome email (use the the sendEmail helper function from /libs/resend)
     // For instance, saving the lead in the database (uncomment the code below)
 
-    // const supabase = createClient();
-    // await supabase.from("leads").insert({ email: body.email });
+    // const pb = createClient();
+    // await pb.from("leads").insert({ email: body.email });
 
     return NextResponse.json({});
   } catch (e) {

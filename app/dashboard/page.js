@@ -1,4 +1,4 @@
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { redirect } from "next/navigation";
 import { determineUserRole, validateAdminAccess } from "@/libs/admin";
 import ArtistDashboard from "@/components/dashboard/ArtistDashboard";
@@ -8,18 +8,18 @@ import DJDashboard from "@/components/dashboard/DJDashboard";
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-  const supabase = createClient();
+  const pb = createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await pb.auth.getUser();
 
   if (!user) {
     redirect("/signin");
   }
 
   // Get user profile to determine role
-  let { data: profile } = await supabase
+  let { data: profile } = await pb
     .from("profiles")
     .select("*")
     .eq("id", user.id)
@@ -29,7 +29,7 @@ export default async function Dashboard() {
     // Create profile if it doesn't exist with proper role determination
     const correctRole = determineUserRole(user.email, 'artist');
     
-    const { data: newProfile } = await supabase
+    const { data: newProfile } = await pb
       .from("profiles")
       .insert({
         id: user.id,
@@ -50,14 +50,14 @@ export default async function Dashboard() {
 
     // Update role if needed (email-based admin check)
     if (shouldBeAdmin && currentRole !== 'admin') {
-      await supabase
+      await pb
         .from("profiles")
         .update({ role: 'admin' })
         .eq("id", user.id);
       profile.role = 'admin';
     } else if (!shouldBeAdmin && currentRole === 'admin') {
       // Remove admin access if email no longer in list
-      await supabase
+      await pb
         .from("profiles")
         .update({ role: 'artist' })
         .eq("id", user.id);

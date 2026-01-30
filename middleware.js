@@ -1,4 +1,4 @@
-import { updateSession } from "@/libs/supabase/middleware";
+import { updateSession } from "@/libs/pressbase/middleware";
 
 export async function middleware(request) {
   return await updateSession(request);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import AudioPlayer from "../AudioPlayer";
 import toast from "react-hot-toast";
 
@@ -11,7 +11,7 @@ export default function TrackApproval({ onStatsUpdate }) {
   const [filter, setFilter] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchTracks();
@@ -19,7 +19,7 @@ export default function TrackApproval({ onStatsUpdate }) {
 
   const fetchTracks = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await pb
         .from("tracks")
         .select(`
           *,
@@ -42,7 +42,7 @@ export default function TrackApproval({ onStatsUpdate }) {
 
   const updateTrackStatus = async (trackId, status, reason = null) => {
     try {
-      const { error } = await supabase
+      const { error } = await pb
         .from("tracks")
         .update({ 
           status,
@@ -84,7 +84,7 @@ export default function TrackApproval({ onStatsUpdate }) {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await pb
         .from("tracks")
         .delete()
         .eq("id", trackId);

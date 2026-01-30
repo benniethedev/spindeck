@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 
 export default function AudioPlayer({ src, title, artist, trackId, className = "" }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,7 +10,7 @@ export default function AudioPlayer({ src, title, artist, trackId, className = "
   const [loading, setLoading] = useState(false);
   const audioRef = useRef(null);
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -47,7 +47,7 @@ export default function AudioPlayer({ src, title, artist, trackId, className = "
         
         // Track play analytics if trackId is provided
         if (trackId) {
-          await supabase
+          await pb
             .from("analytics")
             .insert({
               track_id: trackId,

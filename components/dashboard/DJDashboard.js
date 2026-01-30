@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import ButtonAccount from "@/components/ButtonAccount";
 import BrandLogo from "@/components/BrandLogo";
 import AudioPlayer from "../AudioPlayer";
@@ -27,7 +27,7 @@ export default function DJDashboard({ user, profile }) {
   const [bpmRange, setBpmRange] = useState({ min: "", max: "" });
   const [activeTab, setActiveTab] = useState("browse");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchTracks();
@@ -36,7 +36,7 @@ export default function DJDashboard({ user, profile }) {
 
   const fetchTracks = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await pb
         .from("tracks")
         .select(`
           *,
@@ -60,7 +60,7 @@ export default function DJDashboard({ user, profile }) {
 
   const fetchDownloads = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await pb
         .from("downloads")
         .select(`
           *,
@@ -94,7 +94,7 @@ export default function DJDashboard({ user, profile }) {
       }
 
       // Record the download
-      const { error } = await supabase
+      const { error } = await pb
         .from("downloads")
         .insert({
           track_id: track.id,
@@ -106,7 +106,7 @@ export default function DJDashboard({ user, profile }) {
       if (error) throw error;
 
       // Update track download count
-      await supabase
+      await pb
         .from("tracks")
         .update({ 
           download_count: (track.download_count || 0) + 1 
@@ -114,7 +114,7 @@ export default function DJDashboard({ user, profile }) {
         .eq("id", track.id);
 
       // Record analytics
-      await supabase
+      await pb
         .from("analytics")
         .insert({
           track_id: track.id,

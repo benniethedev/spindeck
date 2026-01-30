@@ -1,14 +1,14 @@
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const supabase = createClient();
+    const pb = createClient();
 
     // Check if user is authenticated
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await pb.auth.getUser();
 
     if (!user) {
       return NextResponse.json(
@@ -37,8 +37,8 @@ export async function POST(request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    // Upload to PressBase Storage
+    const { data, error } = await pb.storage
       .from("tracks")
       .upload(filePath, buffer, {
         contentType: file.type,
@@ -54,7 +54,7 @@ export async function POST(request) {
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = pb.storage
       .from("tracks")
       .getPublicUrl(filePath);
 

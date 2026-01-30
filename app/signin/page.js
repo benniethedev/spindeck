@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 import config from "@/config";
 
-// This a login/singup page for Supabase Auth.
-// Successfull login redirects to /api/auth/callback where the Code Exchange is processed (see app/api/auth/callback/route.js).
+// This a login/signup page for PressBase Auth.
+// Successful login redirects to /api/auth/callback where the Code Exchange is processed (see app/api/auth/callback/route.js).
 function LoginForm() {
-  const supabase = createClient();
+  const pb = createClient();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState("artist");
@@ -34,14 +34,14 @@ function LoginForm() {
       const redirectURL = window.location.origin + "/api/auth/callback" + `?role=${selectedRole}`;
 
       if (type === "oauth") {
-        await supabase.auth.signInWithOAuth({
+        await pb.auth.signInWithOAuth({
           provider,
           options: {
             redirectTo: redirectURL,
           },
         });
       } else if (type === "magic_link") {
-        await supabase.auth.signInWithOtp({
+        await pb.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: redirectURL,

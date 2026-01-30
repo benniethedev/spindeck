@@ -1,6 +1,6 @@
 import configFile from "@/config";
 import { findCheckoutSession } from "@/libs/stripe";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/libs/pressbase/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -22,11 +22,8 @@ export async function POST(req) {
   let eventType;
   let event;
 
-  // Create a private supabase client using the secret service_role API key
-  const supabase = new SupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  // Create a PressBase service client using the service key
+  const pb = createServiceClient();
 
   // verify Stripe event is legit
   try {
@@ -59,7 +56,7 @@ export async function POST(req) {
         let user;
         if (!userId) {
           // check if user already exists
-          const { data: profile } = await supabase
+          const { data: profile } = await pb
             .from("profiles")
             .select("*")
             .eq("email", customer.email)
@@ -67,8 +64,8 @@ export async function POST(req) {
           if (profile) {
             user = profile;
           } else {
-            // create a new user using supabase auth admin
-            const { data } = await supabase.auth.admin.createUser({
+            // create a new user using PressBase auth admin
+            const { data } = await pb.auth.admin.createUser({
               email: customer.email,
             });
 
@@ -76,7 +73,7 @@ export async function POST(req) {
           }
         } else {
           // find user by ID
-          const { data: profile } = await supabase
+          const { data: profile } = await pb
             .from("profiles")
             .select("*")
             .eq("id", userId)
@@ -85,7 +82,7 @@ export async function POST(req) {
           user = profile;
         }
 
-        await supabase
+        await pb
           .from("profiles")
           .update({
             customer_id: customerId,
@@ -125,7 +122,7 @@ export async function POST(req) {
           stripeObject.id
         );
 
-        await supabase
+        await pb
           .from("profiles")
           .update({ has_access: false })
           .eq("customer_id", subscription.customer);
@@ -140,7 +137,7 @@ export async function POST(req) {
         const customerId = stripeObject.customer;
 
         // Find profile where customer_id equals the customerId (in table called 'profiles')
-        const { data: profile } = await supabase
+        const { data: profile } = await pb
           .from("profiles")
           .select("*")
           .eq("customer_id", customerId)
@@ -150,7 +147,7 @@ export async function POST(req) {
         if (profile.price_id !== priceId) break;
 
         // Grant the profile access to your product. It's a boolean in the database, but could be a number of credits, etc...
-        await supabase
+        await pb
           .from("profiles")
           .update({ has_access: true })
           .eq("customer_id", customerId);

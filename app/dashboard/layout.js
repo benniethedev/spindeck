@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import config from "@/config";
 
 // This is a server-side component to ensure the user is logged in.
@@ -8,11 +8,11 @@ import config from "@/config";
 // You can also add custom static UI elements like a Navbar, Sidebar, Footer, etc..
 // See https://shipfa.st/docs/tutorials/private-page
 export default async function LayoutPrivate({ children }) {
-  const supabase = createClient();
+  const pb = createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await pb.auth.getUser();
 
   if (!user) {
     redirect(config.auth.loginUrl);

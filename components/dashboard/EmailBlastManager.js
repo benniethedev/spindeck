@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 
 export default function EmailBlastManager() {
@@ -16,7 +16,7 @@ export default function EmailBlastManager() {
     scheduled_for: "",
   });
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchData();
@@ -25,7 +25,7 @@ export default function EmailBlastManager() {
   const fetchData = async () => {
     try {
       // Fetch email blasts
-      const { data: blasts, error: blastsError } = await supabase
+      const { data: blasts, error: blastsError } = await pb
         .from("email_blasts")
         .select(`
           *,
@@ -40,7 +40,7 @@ export default function EmailBlastManager() {
       if (blastsError) throw blastsError;
 
       // Fetch approved tracks for the dropdown
-      const { data: approvedTracks, error: tracksError } = await supabase
+      const { data: approvedTracks, error: tracksError } = await pb
         .from("tracks")
         .select("id, title, artist_name")
         .eq("status", "approved")
@@ -72,14 +72,14 @@ export default function EmailBlastManager() {
     }
 
     try {
-      const { data: user } = await supabase.auth.getUser();
+      const { data: user } = await pb.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
 
       const scheduledDate = formData.scheduled_for 
         ? new Date(formData.scheduled_for).toISOString()
         : null;
 
-      const { data, error } = await supabase
+      const { data, error } = await pb
         .from("email_blasts")
         .insert({
           track_id: formData.track_id,
@@ -125,7 +125,7 @@ export default function EmailBlastManager() {
       // In a real implementation, you'd integrate with an email service like SendGrid, Mailchimp, etc.
       // For now, we'll simulate sending by updating the status
       
-      const { error } = await supabase
+      const { error } = await pb
         .from("email_blasts")
         .update({
           status: "sent",
@@ -157,7 +157,7 @@ export default function EmailBlastManager() {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await pb
         .from("email_blasts")
         .delete()
         .eq("id", blastId);

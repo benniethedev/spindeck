@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { determineUserRole } from "@/libs/admin";
 import config from "@/config";
 
@@ -12,8 +12,8 @@ export async function GET(req) {
   const role = requestUrl.searchParams.get("role");
 
   if (code) {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.exchangeCodeForSession(code);
+    const pb = createClient();
+    const { data: { user } } = await pb.auth.exchangeCodeForSession(code);
 
     // If we have a user, create or update their profile
     if (user) {
@@ -21,7 +21,7 @@ export async function GET(req) {
       const finalRole = determineUserRole(user.email, role);
 
       // Check if profile exists
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile } = await pb
         .from("profiles")
         .select("*")
         .eq("id", user.id)
@@ -29,7 +29,7 @@ export async function GET(req) {
 
       if (existingProfile) {
         // Update existing profile with the determined role
-        await supabase
+        await pb
           .from("profiles")
           .update({ 
             role: finalRole,
@@ -39,7 +39,7 @@ export async function GET(req) {
           .eq("id", user.id);
       } else {
         // Create new profile with the determined role
-        await supabase
+        await pb
           .from("profiles")
           .insert({
             id: user.id,

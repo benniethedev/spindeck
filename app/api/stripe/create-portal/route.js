@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { createCustomerPortal } from "@/libs/stripe";
 
 export async function POST(req) {
   try {
-    const supabase = createClient();
+    const pb = createClient();
 
     const body = await req.json();
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await pb.auth.getUser();
 
     // User who are not logged in can't make a purchase
     if (!user) {
@@ -25,7 +25,7 @@ export async function POST(req) {
       );
     }
 
-    const { data } = await supabase
+    const { data } = await pb
       .from("profiles")
       .select("*")
       .eq("id", user?.id)

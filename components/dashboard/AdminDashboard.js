@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import ButtonAccount from "@/components/ButtonAccount";
 import BrandLogo from "@/components/BrandLogo";
 import UserManagement from "./UserManagement";
@@ -27,7 +27,7 @@ export default function AdminDashboard({ user, profile, isPreviewOnly = false, p
   });
   const [loading, setLoading] = useState(true);
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchAdminStats();
@@ -36,14 +36,14 @@ export default function AdminDashboard({ user, profile, isPreviewOnly = false, p
   const fetchAdminStats = async () => {
     try {
       // Fetch user stats
-      const { data: users, error: usersError } = await supabase
+      const { data: users, error: usersError } = await pb
         .from("profiles")
         .select("role");
 
       if (usersError) throw usersError;
 
       // Fetch track stats
-      const { data: tracks, error: tracksError } = await supabase
+      const { data: tracks, error: tracksError } = await pb
         .from("tracks")
         .select("status, play_count, download_count");
 

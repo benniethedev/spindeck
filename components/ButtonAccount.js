@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import apiClient from "@/libs/api";
 
 // A button to show user some account actions
@@ -13,7 +13,7 @@ import apiClient from "@/libs/api";
 //  2. Logout: sign out and go back to homepage
 // See more at https://shipfa.st/docs/components/buttonAccount
 const ButtonAccount = () => {
-  const supabase = createClient();
+  const pb = createClient();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -21,16 +21,16 @@ const ButtonAccount = () => {
     const getUser = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await pb.auth.getUser();
 
       setUser(user);
     };
 
     getUser();
-  }, [supabase]);
+  }, [pb]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await pb.auth.signOut();
     window.location.href = "/";
   };
 

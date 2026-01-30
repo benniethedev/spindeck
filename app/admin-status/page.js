@@ -1,13 +1,13 @@
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { getAdminConfig, isAdminEmail } from "@/libs/admin";
 import { redirect } from "next/navigation";
 
 export default async function AdminStatusPage() {
-  const supabase = createClient();
+  const pb = createClient();
   
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await pb.auth.getUser();
 
   // Redirect if not logged in
   if (!user) {

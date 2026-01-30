@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 
 export default function UserManagement({ onStatsUpdate }) {
@@ -11,7 +11,7 @@ export default function UserManagement({ onStatsUpdate }) {
   const [roleFilter, setRoleFilter] = useState("all");
   const [sortBy, setSortBy] = useState("created_at");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchUsers();
@@ -20,7 +20,7 @@ export default function UserManagement({ onStatsUpdate }) {
   const fetchUsers = async () => {
     try {
       // First get auth users to get email addresses
-      const { data: profiles, error } = await supabase
+      const { data: profiles, error } = await pb
         .from("profiles")
         .select(`
           *,
@@ -37,7 +37,7 @@ export default function UserManagement({ onStatsUpdate }) {
       const usersWithEmails = await Promise.all(
         profiles.map(async (profile) => {
           try {
-            const { data: authUser } = await supabase.auth.admin.getUserById(profile.id);
+            const { data: authUser } = await pb.auth.admin.getUserById(profile.id);
             return {
               ...profile,
               email: authUser?.user?.email || "Unknown",
@@ -62,7 +62,7 @@ export default function UserManagement({ onStatsUpdate }) {
 
   const updateUserRole = async (userId, newRole) => {
     try {
-      const { error } = await supabase
+      const { error } = await pb
         .from("profiles")
         .update({ role: newRole })
         .eq("id", userId);
@@ -88,7 +88,7 @@ export default function UserManagement({ onStatsUpdate }) {
 
     try {
       // Delete user profile (this should cascade delete related data due to foreign key constraints)
-      const { error } = await supabase
+      const { error } = await pb
         .from("profiles")
         .delete()
         .eq("id", userId);

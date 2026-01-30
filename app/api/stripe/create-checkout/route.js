@@ -1,5 +1,5 @@
 import { createCheckout } from "@/libs/stripe";
-import { createClient } from "@/libs/supabase/server";
+import { createClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
 
 // This function is used to create a Stripe Checkout Session (one-time payment or subscription)
@@ -29,15 +29,15 @@ export async function POST(req) {
   }
 
   try {
-    const supabase = createClient();
+    const pb = createClient();
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await pb.auth.getUser();
 
     const { priceId, mode, successUrl, cancelUrl } = body;
 
-    const { data } = await supabase
+    const { data } = await pb
       .from("profiles")
       .select("*")
       .eq("id", user?.id)

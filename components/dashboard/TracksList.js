@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import AudioPlayer from "../AudioPlayer";
 import toast from "react-hot-toast";
 
@@ -10,7 +10,7 @@ export default function TracksList({ userId }) {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  const supabase = createClient();
+  const pb = createClient();
 
   useEffect(() => {
     fetchTracks();
@@ -18,7 +18,7 @@ export default function TracksList({ userId }) {
 
   const fetchTracks = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await pb
         .from("tracks")
         .select("*")
         .eq("user_id", userId)
@@ -40,7 +40,7 @@ export default function TracksList({ userId }) {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await pb
         .from("tracks")
         .delete()
         .eq("id", trackId);

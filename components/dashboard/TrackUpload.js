@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/libs/supabase/client";
+import { createClient } from "@/libs/pressbase/client";
 import toast from "react-hot-toast";
 
 const genres = [
@@ -29,7 +29,7 @@ export default function TrackUpload({ userId, onSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const supabase = createClient();
+  const pb = createClient();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +61,7 @@ export default function TrackUpload({ userId, onSuccess }) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await pb.storage
       .from("tracks")
       .upload(filePath, file);
 
@@ -69,7 +69,7 @@ export default function TrackUpload({ userId, onSuccess }) {
       throw error;
     }
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = pb.storage
       .from("tracks")
       .getPublicUrl(filePath);
 
@@ -117,7 +117,7 @@ export default function TrackUpload({ userId, onSuccess }) {
 
       // Save track to database
       setUploadProgress(90);
-      const { data: track, error } = await supabase
+      const { data: track, error } = await pb
         .from("tracks")
         .insert({
           user_id: userId,
