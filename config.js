@@ -16,13 +16,17 @@ const config = {
   },
   stripe: {
     // Create multiple plans in your Stripe dashboard, then add them here. You can add as many plans as you want, just make sure to add the priceId
+    // ⚠️ IMPORTANT: Production price IDs must be created in Stripe Dashboard (live mode) and added below
+    // See: https://dashboard.stripe.com/products (switch to Live mode)
     plans: [
       {
-        // Test: price_1Sv5P52RSmrbs0ADrAupJ0zy | Prod: TBD
+        // Test: price_1Sv5P52RSmrbs0ADrAupJ0zy
+        // TODO: Replace production priceId with real Stripe price ID from live dashboard
+        // Production priceId should look like: price_1Xxx... (create in Stripe Dashboard → Products → Basic → Pricing)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P52RSmrbs0ADrAupJ0zy"
-            : "price_spindeck_basic_prod",
+            : "price_spindeck_basic_prod", // TODO: Replace with live price ID
         name: "Basic",
         description: "Perfect for new artists starting out",
         price: 29.99,
@@ -35,11 +39,12 @@ const config = {
         ],
       },
       {
-        // Test: price_1Sv5P62RSmrbs0ADMQ6IUwdw | Prod: TBD
+        // Test: price_1Sv5P62RSmrbs0ADMQ6IUwdw
+        // TODO: Replace production priceId with real Stripe price ID (Silver plan)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P62RSmrbs0ADMQ6IUwdw"
-            : "price_spindeck_silver_prod",
+            : "price_spindeck_silver_prod", // TODO: Replace with live price ID
         name: "Silver",
         description: "Growing artists ready to expand",
         price: 200,
@@ -54,11 +59,12 @@ const config = {
       },
       {
         isFeatured: true,
-        // Test: price_1Sv5P72RSmrbs0ADqHH8GjVh | Prod: TBD
+        // Test: price_1Sv5P72RSmrbs0ADqHH8GjVh
+        // TODO: Replace production priceId with real Stripe price ID (Gold plan)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P72RSmrbs0ADqHH8GjVh"
-            : "price_spindeck_gold_prod",
+            : "price_spindeck_gold_prod", // TODO: Replace with live price ID
         name: "Gold",
         description: "Professional artists & labels",
         price: 800,
@@ -73,11 +79,12 @@ const config = {
         ],
       },
       {
-        // Test: price_1Sv5P72RSmrbs0ADHS2x4OsE | Prod: TBD
+        // Test: price_1Sv5P72RSmrbs0ADHS2x4OsE
+        // TODO: Replace production priceId with real Stripe price ID (Platinum plan)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P72RSmrbs0ADHS2x4OsE"
-            : "price_spindeck_platinum_prod",
+            : "price_spindeck_platinum_prod", // TODO: Replace with live price ID
         name: "Platinum",
         description: "Elite labels & management",
         price: 2000,
@@ -92,11 +99,12 @@ const config = {
         ],
       },
       {
-        // Test: price_1Sv5P82RSmrbs0ADwPkrTBTs | Prod: TBD
+        // Test: price_1Sv5P82RSmrbs0ADwPkrTBTs
+        // TODO: Replace production priceId with real Stripe price ID (Mixtape one-time)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P82RSmrbs0ADwPkrTBTs"
-            : "price_spindeck_mixtape_prod",
+            : "price_spindeck_mixtape_prod", // TODO: Replace with live price ID
         name: "Mixtape",
         description: "One-time mixtape promotion",
         price: 200,
@@ -110,11 +118,12 @@ const config = {
         ],
       },
       {
-        // Test: price_1Sv5P92RSmrbs0AD9AFS3WPL | Prod: TBD
+        // Test: price_1Sv5P92RSmrbs0AD9AFS3WPL
+        // TODO: Replace production priceId with real Stripe price ID (Newsletter one-time)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P92RSmrbs0AD9AFS3WPL"
-            : "price_spindeck_newsletter_prod",
+            : "price_spindeck_newsletter_prod", // TODO: Replace with live price ID
         name: "Newsletter",
         description: "Mass email promotion",
         price: 200,
