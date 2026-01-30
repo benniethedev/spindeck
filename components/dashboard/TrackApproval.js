@@ -10,6 +10,8 @@ export default function TrackApproval({ onStatsUpdate }) {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [notesModalData, setNotesModalData] = useState({ trackId: null, action: null, notes: "" });
 
   const pb = createClient();
 
@@ -40,32 +42,40 @@ export default function TrackApproval({ onStatsUpdate }) {
     }
   };
 
-  const updateTrackStatus = async (trackId, status, reason = null) => {
+  const updateTrackStatus = async (trackId, status, notes = null) => {
     try {
+      const track = tracks.find(t => t.id === trackId);
+      const metadataUpdate = {
+        ...track?.metadata,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: "admin",
+      };
+
+      if (status === "rejected" && notes) {
+        metadataUpdate.rejection_reason = notes;
+      }
+      if (status === "approved" && notes) {
+        metadataUpdate.approval_notes = notes;
+      }
+
       const { error } = await pb
         .from("tracks")
         .update({ 
           status,
           updated_at: new Date().toISOString(),
-          ...(reason && { 
-            metadata: { 
-              ...tracks.find(t => t.id === trackId)?.metadata,
-              rejection_reason: reason,
-              reviewed_at: new Date().toISOString()
-            }
-          })
+          metadata: metadataUpdate
         })
         .eq("id", trackId);
 
       if (error) throw error;
 
-      setTracks(tracks.map(track => 
-        track.id === trackId 
-          ? { ...track, status, updated_at: new Date().toISOString() } 
-          : track
+      setTracks(tracks.map(t => 
+        t.id === trackId 
+          ? { ...t, status, metadata: metadataUpdate, updated_at: new Date().toISOString() } 
+          : t
       ));
 
-      toast.success(`Track ${status}`);
+      toast.success(`Track ${status === "approved" ? "approved" : status === "rejected" ? "rejected" : "updated"}`);
       if (onStatsUpdate) onStatsUpdate();
     } catch (error) {
       console.error("Error updating track status:", error);
@@ -73,9 +83,20 @@ export default function TrackApproval({ onStatsUpdate }) {
     }
   };
 
-  const handleReject = (trackId) => {
-    const reason = prompt("Please provide a reason for rejection (optional):");
-    updateTrackStatus(trackId, "rejected", reason);
+  const openNotesModal = (trackId, action) => {
+    setNotesModalData({ trackId, action, notes: "" });
+    setShowNotesModal(true);
+  };
+
+  const handleNotesSubmit = () => {
+    const { trackId, action, notes } = notesModalData;
+    updateTrackStatus(trackId, action, notes);
+    setShowNotesModal(false);
+    setNotesModalData({ trackId: null, action: null, notes: "" });
+  };
+
+  const handleQuickApprove = (trackId) => {
+    updateTrackStatus(trackId, "approved");
   };
 
   const deleteTrack = async (trackId) => {
@@ -288,6 +309,11 @@ export default function TrackApproval({ onStatsUpdate }) {
                         <strong>Rejection reason:</strong> {track.metadata.rejection_reason}
                       </div>
                     )}
+                    {track.metadata?.approval_notes && (
+                      <div className="mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded text-sm text-green-400">
+                        <strong>Approval notes:</strong> {track.metadata.approval_notes}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -309,13 +335,21 @@ export default function TrackApproval({ onStatsUpdate }) {
                   {track.status === "pending" && (
                     <>
                       <button
-                        onClick={() => updateTrackStatus(track.id, "approved")}
+                        onClick={() => handleQuickApprove(track.id)}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                        title="Quick approve"
                       >
                         ✅ Approve
                       </button>
                       <button
-                        onClick={() => handleReject(track.id)}
+                        onClick={() => openNotesModal(track.id, "approved")}
+                        className="px-3 py-2 bg-green-800 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        title="Approve with notes"
+                      >
+                        📝 + Notes
+                      </button>
+                      <button
+                        onClick={() => openNotesModal(track.id, "rejected")}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
                       >
                         ❌ Reject
@@ -351,6 +385,71 @@ export default function TrackApproval({ onStatsUpdate }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Notes Modal */}
+      {showNotesModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-spindeck-dark rounded-lg border border-gray-800 w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">
+                  {notesModalData.action === "approved" ? "Approve Track" : "Reject Track"}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowNotesModal(false);
+                    setNotesModalData({ trackId: null, action: null, notes: "" });
+                  }}
+                  className="text-spindeck-gray hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p className="text-spindeck-gray text-sm mb-4">
+                {notesModalData.action === "approved"
+                  ? "Add optional notes for this approval (visible to the artist):"
+                  : "Provide a reason for rejection (helps the artist understand what to improve):"}
+              </p>
+
+              <textarea
+                value={notesModalData.notes}
+                onChange={(e) => setNotesModalData({ ...notesModalData, notes: e.target.value })}
+                rows={4}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-spindeck-gray focus:outline-none focus:border-spindeck-red resize-none"
+                placeholder={
+                  notesModalData.action === "approved"
+                    ? "Great track! Looking forward to more..."
+                    : "Please improve audio quality, fix metadata, etc..."
+                }
+                autoFocus
+              />
+
+              <div className="flex space-x-3 mt-4">
+                <button
+                  onClick={() => {
+                    setShowNotesModal(false);
+                    setNotesModalData({ trackId: null, action: null, notes: "" });
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleNotesSubmit}
+                  className={`flex-1 px-4 py-2 text-white rounded-lg font-medium transition-colors ${
+                    notesModalData.action === "approved"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {notesModalData.action === "approved" ? "✅ Approve" : "❌ Reject"}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

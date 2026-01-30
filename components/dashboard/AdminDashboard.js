@@ -8,6 +8,7 @@ import UserManagement from "./UserManagement";
 import TrackApproval from "./TrackApproval";
 import EmailBlastManager from "./EmailBlastManager";
 import AdminAnalytics from "./AdminAnalytics";
+import PlanManagement from "./PlanManagement";
 import ArtistDashboard from "./ArtistDashboard";
 import DJDashboard from "./DJDashboard";
 import toast from "react-hot-toast";
@@ -82,6 +83,7 @@ export default function AdminDashboard({ user, profile, isPreviewOnly = false, p
     { id: "overview", label: "Overview", icon: "📊" },
     { id: "users", label: "User Management", icon: "👥" },
     { id: "tracks", label: "Track Approval", icon: "🎵" },
+    { id: "plans", label: "Plans", icon: "💰" },
     { id: "emails", label: "Email Blasts", icon: "📧" },
     { id: "analytics", label: "Analytics", icon: "📈" },
   ];
@@ -328,6 +330,10 @@ export default function AdminDashboard({ user, profile, isPreviewOnly = false, p
 
           {activeTab === "tracks" && (
             <TrackApproval onStatsUpdate={fetchAdminStats} />
+          )}
+
+          {activeTab === "plans" && (
+            <PlanManagement />
           )}
 
           {activeTab === "emails" && (
