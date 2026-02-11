@@ -1,8 +1,13 @@
-import { createServiceClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
 import { sendEmail } from "@/libs/resend";
 import { randomBytes } from "crypto";
 import config from "@/config";
+
+const API_BASE = process.env.NEXT_PUBLIC_PRESSBASE_URL || "https://backend.benbond.dev/wp-json/app/v1";
+const SERVICE_KEY = process.env.PRESSBASE_SERVICE_KEY;
+
+// Admin emails that get special privileges
+const ADMIN_EMAILS = ["bencbond@gmail.com", "lmcmedia2@gmail.com"];
 
 export async function POST(request) {
   try {
@@ -26,6 +31,9 @@ export async function POST(request) {
     // Validate role
     const validRole = ["artist", "dj"].includes(role) ? role : "artist";
 
+    // Check if user is admin
+    const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
+
     // Generate verification token
     const verificationToken = randomBytes(32).toString("hex");
     const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
@@ -37,99 +45,117 @@ export async function POST(request) {
       .replace(/^-|-$/g, "");
     const uniqueSlug = `${baseSlug}-${randomBytes(4).toString("hex")}`;
 
-    const pb = createServiceClient();
-
-    // Create user with PressBase admin API
-    const { data: user, error: userError } = await pb.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: false, // Require email verification
-      user_metadata: {
+    // 1. Register user with PressBase
+    const registerResponse = await fetch(`${API_BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password,
         display_name: displayName,
-        role: validRole,
-        verification_token: verificationToken,
-        verification_token_expires: tokenExpiry.toISOString(),
-      },
+      }),
     });
 
-    if (userError) {
+    const registerData = await registerResponse.json();
+
+    if (!registerResponse.ok) {
       // Check for duplicate email
-      if (userError.message?.includes("already exists") || userError.message?.includes("duplicate")) {
+      if (registerData.message?.includes("exists") || registerData.code === "email_exists") {
         return NextResponse.json(
           { error: "An account with this email already exists" },
           { status: 400 }
         );
       }
-      throw userError;
+      return NextResponse.json(
+        { error: registerData.message || "Registration failed" },
+        { status: 400 }
+      );
     }
 
-    // Create profile for the user
-    const { error: profileError } = await pb.from("profiles").insert({
-      owner_user_id: user.id,
-      role: validRole,
-      full_name: displayName,
-      profile_slug: uniqueSlug,
-      email_verified: false,
-      verification_token: verificationToken,
-      verification_token_expires: tokenExpiry.toISOString(),
+    const userId = registerData.data?.user?.id;
+
+    // 2. Create profile with role and verification token
+    const profileResponse = await fetch(`${API_BASE}/db/profiles`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SERVICE_KEY}`,
+      },
+      body: JSON.stringify({
+        user_id: String(userId),
+        username: uniqueSlug,
+        full_name: displayName,
+        role: validRole,
+        is_admin: isAdmin,
+        slug: uniqueSlug,
+        plan_id: "free",
+        created_at: new Date().toISOString(),
+      }),
     });
 
-    if (profileError) {
-      console.error("Profile creation error:", profileError);
-      // Cleanup: delete the user if profile creation fails
-      await pb.auth.admin.deleteUser(user.id);
-      throw profileError;
+    if (!profileResponse.ok) {
+      console.error("Failed to create profile:", await profileResponse.text());
     }
 
-    // Send verification email
-    const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || `https://${config.domainName}`}/verify-email/${verificationToken}`;
-
-    await sendEmail({
-      to: email,
-      subject: `Verify your ${config.appName} account`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #000; color: #fff; padding: 40px 20px;">
-          <div style="max-width: 500px; margin: 0 auto; background-color: #111; border-radius: 12px; padding: 40px; border: 1px solid #333;">
-            <h1 style="color: #FF3C3C; margin-top: 0; font-size: 24px;">Welcome to ${config.appName}! 🎵</h1>
-            
-            <p style="color: #ccc; line-height: 1.6;">Hey ${displayName},</p>
-            
-            <p style="color: #ccc; line-height: 1.6;">Thanks for signing up as ${validRole === "artist" ? "an Artist" : "a DJ"}! Please verify your email address to get started.</p>
-            
-            <a href="${verificationUrl}" style="display: inline-block; background-color: #FF3C3C; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; margin: 20px 0;">
-              Verify Email Address
-            </a>
-            
-            <p style="color: #888; font-size: 14px; margin-top: 30px;">
-              This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.
-            </p>
-            
-            <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
-            
-            <p style="color: #666; font-size: 12px; margin-bottom: 0;">
-              © ${new Date().getFullYear()} ${config.appName}. All rights reserved.
-            </p>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `Welcome to ${config.appName}!\n\nHey ${displayName}, thanks for signing up! Please verify your email by clicking this link:\n\n${verificationUrl}\n\nThis link expires in 24 hours.`,
-    });
+    // 3. Send verification email
+    const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://spinrec.com'}/verify-email/${verificationToken}`;
+    
+    try {
+      await sendEmail({
+        to: email,
+        subject: `Verify your ${config.appName} account`,
+        text: `Welcome to ${config.appName}!\n\nPlease verify your email by clicking this link:\n${verifyUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create this account, you can ignore this email.`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .button { display: inline-block; padding: 12px 24px; background-color: #FF3C3C; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; }
+              .footer { margin-top: 30px; font-size: 12px; color: #666; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Welcome to ${config.appName}!</h1>
+              <p>Hi ${displayName},</p>
+              <p>Thanks for signing up as ${validRole === 'artist' ? 'an Artist' : 'a DJ'}! Please verify your email address to get started.</p>
+              <p style="margin: 30px 0;">
+                <a href="${verifyUrl}" class="button">Verify Email Address</a>
+              </p>
+              <p>Or copy this link: <br><a href="${verifyUrl}">${verifyUrl}</a></p>
+              <p>This link expires in 24 hours.</p>
+              <div class="footer">
+                <p>If you didn't create this account, you can safely ignore this email.</p>
+                <p>© ${new Date().getFullYear()} ${config.appName}</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // Don't fail registration if email fails - they can request a new one
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Account created. Please check your email to verify your account.",
+      message: "Account created! Please check your email to verify your account.",
+      user: {
+        id: userId,
+        email,
+        displayName,
+        role: validRole,
+        isAdmin,
+        emailVerified: false,
+      },
     });
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: error.message || "Registration failed" },
+      { error: "Registration failed. Please try again." },
       { status: 500 }
     );
   }

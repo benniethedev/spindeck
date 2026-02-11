@@ -1,5 +1,7 @@
-import { createServiceClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
+
+const API_BASE = process.env.NEXT_PUBLIC_PRESSBASE_URL || "https://backend.benbond.dev/wp-json/app/v1";
+const SERVICE_KEY = process.env.PRESSBASE_SERVICE_KEY;
 
 export async function POST(request) {
   try {
@@ -12,16 +14,18 @@ export async function POST(request) {
       );
     }
 
-    const pb = createServiceClient();
+    // Find profile with this verification token using direct API call
+    const findResponse = await fetch(
+      `${API_BASE}/db/profiles?where[verification_token]=${encodeURIComponent(token)}&limit=1`,
+      {
+        headers: { "Authorization": `Bearer ${SERVICE_KEY}` },
+      }
+    );
+    const findData = await findResponse.json();
+    const profiles = findData.data || findData;
+    const profile = profiles?.[0];
 
-    // Find profile with this verification token
-    const { data: profile, error: findError } = await pb
-      .from("profiles")
-      .select("id, owner_user_id, verification_token_expires, email_verified")
-      .eq("verification_token", token)
-      .single();
-
-    if (findError || !profile) {
+    if (!profile) {
       return NextResponse.json(
         { error: "Invalid or expired verification link" },
         { status: 400 }
@@ -38,7 +42,7 @@ export async function POST(request) {
     }
 
     // Check if token has expired
-    if (new Date(profile.verification_token_expires) < new Date()) {
+    if (profile.verification_expires && new Date(profile.verification_expires) < new Date()) {
       return NextResponse.json(
         { error: "Verification link has expired. Please request a new one." },
         { status: 400 }
@@ -46,24 +50,21 @@ export async function POST(request) {
     }
 
     // Update profile to mark email as verified
-    const { error: updateError } = await pb
-      .from("profiles")
-      .update({
+    const updateResponse = await fetch(`${API_BASE}/db/profiles/${profile.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SERVICE_KEY}`,
+      },
+      body: JSON.stringify({
         email_verified: true,
         verification_token: null,
-        verification_token_expires: null,
-      })
-      .eq("id", profile.id);
+        verification_expires: null,
+      }),
+    });
 
-    if (updateError) {
-      throw updateError;
-    }
-
-    // Also update the user's email_confirmed status in PressBase auth
-    if (profile.owner_user_id) {
-      await pb.auth.admin.updateUserById(profile.owner_user_id, {
-        email_confirm: true,
-      });
+    if (!updateResponse.ok) {
+      throw new Error("Failed to update profile");
     }
 
     return NextResponse.json({

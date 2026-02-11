@@ -1,7 +1,8 @@
-import { createClient, createServiceClient } from "@/libs/pressbase/server";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
+const API_BASE = process.env.NEXT_PUBLIC_PRESSBASE_URL || "https://backend.benbond.dev/wp-json/app/v1";
+const SERVICE_KEY = process.env.PRESSBASE_SERVICE_KEY;
 const TOKEN_KEY = "pb_access_token";
 const REFRESH_KEY = "pb_refresh_token";
 
@@ -16,42 +17,35 @@ export async function POST(request) {
       );
     }
 
-    const pb = createClient();
-
     // Sign in with PressBase
-    const { data, error } = await pb.auth.signInWithPassword({
-      email,
-      password,
+    const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
-    if (error) {
-      // Check for unverified email
-      if (error.message?.includes("not verified") || error.message?.includes("email_not_confirmed")) {
-        return NextResponse.json(
-          { error: "Please verify your email before signing in. Check your inbox for the verification link." },
-          { status: 401 }
-        );
-      }
+    const loginData = await loginResponse.json();
+
+    if (!loginResponse.ok) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: loginData.message || "Invalid email or password" },
         { status: 401 }
       );
     }
 
-    // Check if email is verified using service client
-    const pbService = createServiceClient();
-    const { data: profile } = await pbService
-      .from("profiles")
-      .select("email_verified")
-      .eq("owner_user_id", data.user?.id)
-      .single();
+    const userData = loginData.data || loginData;
+    const userId = userData.user?.id;
+    const accessToken = userData.access_token;
+    const refreshToken = userData.refresh_token;
 
-    // If profile exists and email is not verified, reject login
-    if (profile && profile.email_verified === false) {
-      return NextResponse.json(
-        { error: "Please verify your email before signing in. Check your inbox for the verification link." },
-        { status: 401 }
-      );
+    // Get profile to check verification status and role
+    let profile = null;
+    if (userId) {
+      const profileResponse = await fetch(`${API_BASE}/db/profiles?where[user_id]=${userId}`, {
+        headers: { "Authorization": `Bearer ${SERVICE_KEY}` },
+      });
+      const profileData = await profileResponse.json();
+      profile = profileData.data?.[0] || profileData[0];
     }
 
     // Set cookies for the session
@@ -64,9 +58,11 @@ export async function POST(request) {
       path: "/",
     };
 
-    cookieStore.set(TOKEN_KEY, data.access_token, cookieOptions);
-    if (data.refresh_token) {
-      cookieStore.set(REFRESH_KEY, data.refresh_token, {
+    if (accessToken) {
+      cookieStore.set(TOKEN_KEY, accessToken, cookieOptions);
+    }
+    if (refreshToken) {
+      cookieStore.set(REFRESH_KEY, refreshToken, {
         ...cookieOptions,
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
@@ -74,12 +70,19 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      user: data.user,
+      user: {
+        id: userId,
+        email: userData.user?.email || email,
+        displayName: profile?.full_name || userData.user?.display_name,
+        role: profile?.role || "artist",
+        isAdmin: profile?.is_admin || false,
+        slug: profile?.slug,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Login failed" },
+      { error: "Login failed. Please try again." },
       { status: 500 }
     );
   }
