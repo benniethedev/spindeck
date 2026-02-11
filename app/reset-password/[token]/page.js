@@ -1,74 +1,89 @@
 "use client";
 
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import config from "@/config";
 
-function LoginForm() {
+export default function ResetPasswordPage() {
+  const { token } = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    // Check for registration success message
-    if (searchParams.get("registered") === "true") {
-      toast.success("Account created! Please check your email to verify, then sign in.");
-    }
-    // Check for password reset success
-    if (searchParams.get("reset") === "true") {
-      toast.success("Password reset! You can now sign in with your new password.");
-    }
-    // Check for email verification success
-    if (searchParams.get("verified") === "true") {
-      toast.success("Email verified! You can now sign in.");
-    }
-  }, [searchParams]);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      toast.error("Please enter your email and password");
+    if (!password) {
+      toast.error("Please enter a new password");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ token, password }),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      if (response.ok) {
+        setSuccess(true);
+        toast.success("Password reset successfully!");
+        setTimeout(() => {
+          router.push("/signin?reset=true");
+        }, 2000);
+      } else {
+        toast.error(data.error || "Password reset failed");
       }
-
-      toast.success("Welcome back!");
-      router.push(config.auth.callbackUrl);
-      router.refresh();
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.message || "Invalid email or password");
+      console.error("Reset password error:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (success) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center p-8">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-spindeck-dark rounded-xl p-8 border border-gray-800">
+            <div className="text-5xl mb-6">✅</div>
+            <h1 className="text-2xl font-bold text-white mb-4">Password Reset!</h1>
+            <p className="text-gray-400 mb-6">
+              Your password has been updated successfully.
+            </p>
+            <p className="text-sm text-gray-500">Redirecting to sign in...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-black p-8 md:p-24" data-theme={config.colors.theme}>
       <div className="text-center mb-4">
-        <Link href="/" className="btn btn-ghost btn-sm text-white">
+        <Link href="/signin" className="btn btn-ghost btn-sm text-white">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
@@ -81,56 +96,33 @@ function LoginForm() {
               clipRule="evenodd"
             />
           </svg>
-          Home
+          Back to Sign In
         </Link>
       </div>
 
       <div className="max-w-md mx-auto">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-2 text-white">
-          Welcome back
+          Create new password
         </h1>
         <p className="text-center text-gray-400 mb-8">
-          Sign in to your {config.appName} account
+          Enter your new password below
         </p>
 
         <div className="bg-spindeck-dark rounded-xl p-6 border border-gray-800">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
+            {/* New Password */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+                New Password
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-spindeck-red focus:ring-1 focus:ring-spindeck-red transition-colors"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-medium text-gray-300">
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-spindeck-red hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-spindeck-red focus:ring-1 focus:ring-spindeck-red transition-colors pr-12"
-                  placeholder="••••••••"
+                  placeholder="At least 8 characters"
                 />
                 <button
                   type="button"
@@ -167,7 +159,21 @@ function LoginForm() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Confirm New Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-spindeck-red focus:ring-1 focus:ring-spindeck-red transition-colors"
+                placeholder="Confirm your new password"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -176,37 +182,15 @@ function LoginForm() {
               {isLoading ? (
                 <>
                   <span className="loading loading-spinner loading-sm"></span>
-                  Signing in...
+                  Resetting...
                 </>
               ) : (
-                "Sign In"
+                "Reset Password"
               )}
             </button>
           </form>
         </div>
-
-        {/* Create Account Link */}
-        <p className="text-center text-gray-400 mt-6">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-spindeck-red hover:underline font-medium">
-            Create one
-          </Link>
-        </p>
       </div>
     </main>
-  );
-}
-
-export default function Login() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-black">
-          <div className="text-white">Loading...</div>
-        </div>
-      }
-    >
-      <LoginForm />
-    </Suspense>
   );
 }

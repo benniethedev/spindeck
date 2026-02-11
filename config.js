@@ -22,15 +22,16 @@ const config = {
       {
         // Test: price_1Sv5P52RSmrbs0ADrAupJ0zy
         // TODO: Replace production priceId with real Stripe price ID from live dashboard
-        // Production priceId should look like: price_1Xxx... (create in Stripe Dashboard → Products → Basic → Pricing)
         priceId:
           process.env.NODE_ENV === "development"
             ? "price_1Sv5P52RSmrbs0ADrAupJ0zy"
             : "price_spindeck_basic_prod", // TODO: Replace with live price ID
         name: "Basic",
-        description: "Perfect for new artists starting out",
+        description: "For artists starting out",
         price: 29.99,
         priceAnchor: null,
+        isMonthly: true,
+        uploadLimit: 2, // tracks per month
         features: [
           { name: "2 tracks per month" },
           { name: "1 email blast per month" },
@@ -46,10 +47,13 @@ const config = {
             ? "price_1Sv5P62RSmrbs0ADMQ6IUwdw"
             : "price_spindeck_silver_prod", // TODO: Replace with live price ID
         name: "Silver",
-        description: "Growing artists ready to expand",
+        description: "Lifetime access - Save vs 7 months of Basic!",
         price: 200,
-        priceAnchor: null,
+        priceAnchor: 209.93, // 7 months of Basic
+        isOneTime: true,
+        uploadLimit: 10, // tracks per month
         features: [
+          { name: "LIFETIME ACCESS", highlight: true },
           { name: "10 tracks per month" },
           { name: "5 email blasts per month" },
           { name: "Advanced analytics" },
@@ -66,10 +70,13 @@ const config = {
             ? "price_1Sv5P72RSmrbs0ADqHH8GjVh"
             : "price_spindeck_gold_prod", // TODO: Replace with live price ID
         name: "Gold",
-        description: "Professional artists & labels",
+        description: "Lifetime access - Save vs 27 months of Basic!",
         price: 800,
-        priceAnchor: null,
+        priceAnchor: 809.73, // 27 months of Basic
+        isOneTime: true,
+        uploadLimit: 50, // tracks per month
         features: [
+          { name: "LIFETIME ACCESS", highlight: true },
           { name: "50 tracks per month" },
           { name: "20 email blasts per month" },
           { name: "Premium analytics dashboard" },
@@ -86,10 +93,13 @@ const config = {
             ? "price_1Sv5P72RSmrbs0ADHS2x4OsE"
             : "price_spindeck_platinum_prod", // TODO: Replace with live price ID
         name: "Platinum",
-        description: "Elite labels & management",
+        description: "Lifetime access - Best value for labels",
         price: 2000,
         priceAnchor: null,
+        isOneTime: true,
+        uploadLimit: -1, // unlimited
         features: [
+          { name: "LIFETIME ACCESS", highlight: true },
           { name: "Unlimited tracks" },
           { name: "Unlimited email blasts" },
           { name: "White-label dashboard" },
@@ -106,10 +116,11 @@ const config = {
             ? "price_1Sv5P82RSmrbs0ADwPkrTBTs"
             : "price_spindeck_mixtape_prod", // TODO: Replace with live price ID
         name: "Mixtape",
-        description: "One-time mixtape promotion",
+        description: "Single mixtape promotion",
         price: 200,
         priceAnchor: null,
         isOneTime: true,
+        isAddon: true, // Not a main subscription plan
         features: [
           { name: "Single mixtape upload" },
           { name: "5 targeted email blasts" },
@@ -129,6 +140,7 @@ const config = {
         price: 200,
         priceAnchor: null,
         isOneTime: true,
+        isAddon: true, // Not a main subscription plan
         features: [
           { name: "10,000 recipient blast" },
           { name: "Custom email template" },
@@ -137,6 +149,14 @@ const config = {
         ],
       },
     ],
+  },
+  // Upload limits by plan name (tracks per month, -1 = unlimited)
+  uploadLimits: {
+    free: 0,
+    basic: 2,
+    silver: 10,
+    gold: 50,
+    platinum: -1, // unlimited
   },
   aws: {
     // If you use AWS S3/Cloudfront, put values in here

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createClient } from "@/libs/pressbase/client";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 const genres = [
@@ -140,10 +141,30 @@ export default function TrackUpload({ userId, onSuccess }) {
   const [audioDragActive, setAudioDragActive] = useState(false);
   const [artworkDragActive, setArtworkDragActive] = useState(false);
   const [extractedMetadata, setExtractedMetadata] = useState(null);
+  const [uploadLimits, setUploadLimits] = useState(null);
+  const [loadingLimits, setLoadingLimits] = useState(true);
   
   const audioInputRef = useRef(null);
   const artworkInputRef = useRef(null);
   const pb = createClient();
+
+  // Fetch upload limits on mount
+  useEffect(() => {
+    const fetchLimits = async () => {
+      try {
+        const response = await fetch("/api/upload");
+        if (response.ok) {
+          const data = await response.json();
+          setUploadLimits(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch upload limits:", error);
+      } finally {
+        setLoadingLimits(false);
+      }
+    };
+    fetchLimits();
+  }, []);
 
   // Genre mapping from common ID3 genres to our list
   const mapGenre = (genreStr) => {
@@ -465,9 +486,71 @@ export default function TrackUpload({ userId, onSuccess }) {
     }
   };
 
+  // Check if user has reached upload limit
+  const hasReachedLimit = uploadLimits && !uploadLimits.unlimited && uploadLimits.remaining <= 0;
+  const isFreePlan = uploadLimits && uploadLimits.limit === 0;
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Upload New Track</h2>
+
+      {/* Upload Limits Banner */}
+      {!loadingLimits && uploadLimits && (
+        <div className={`mb-6 rounded-lg p-4 border ${
+          hasReachedLimit 
+            ? "bg-red-500/10 border-red-500/30" 
+            : isFreePlan
+              ? "bg-yellow-500/10 border-yellow-500/30"
+              : "bg-spindeck-dark border-gray-700"
+        }`}>
+          {hasReachedLimit || isFreePlan ? (
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">{isFreePlan ? "🔒" : "⚠️"}</div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white mb-1">
+                  {isFreePlan ? "Subscription Required" : "Monthly Limit Reached"}
+                </h3>
+                <p className="text-sm text-gray-400 mb-3">
+                  {isFreePlan 
+                    ? "You need a subscription plan to upload tracks to the DJ pool."
+                    : `You've used all ${uploadLimits.limit} of your monthly track uploads.`
+                  }
+                </p>
+                <Link 
+                  href="/pricing" 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-spindeck-red hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Upgrade Your Plan
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">📊</span>
+                <div>
+                  <p className="text-sm text-gray-400">Monthly uploads</p>
+                  <p className="font-semibold text-white">
+                    {uploadLimits.unlimited 
+                      ? "Unlimited" 
+                      : `${uploadLimits.current} / ${uploadLimits.limit} used`
+                    }
+                  </p>
+                </div>
+              </div>
+              {!uploadLimits.unlimited && (
+                <div className="text-right">
+                  <p className="text-sm text-gray-400">Remaining</p>
+                  <p className="font-semibold text-green-400">{uploadLimits.remaining} tracks</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       
       <div className="bg-spindeck-dark rounded-lg p-6 border border-gray-800">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -774,7 +857,9 @@ export default function TrackUpload({ userId, onSuccess }) {
           {/* Submit Button */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-800">
             <p className="text-sm text-spindeck-gray">
-              {audioFile ? (
+              {hasReachedLimit || isFreePlan ? (
+                <span className="text-red-400">Upgrade to upload tracks</span>
+              ) : audioFile ? (
                 <span>Ready to upload <strong>{audioFile.name}</strong></span>
               ) : (
                 "Select an audio file to continue"
@@ -782,7 +867,7 @@ export default function TrackUpload({ userId, onSuccess }) {
             </p>
             <button
               type="submit"
-              disabled={uploading || !audioFile || isAnalyzing}
+              disabled={uploading || !audioFile || isAnalyzing || hasReachedLimit || isFreePlan}
               className="px-8 py-3 bg-spindeck-red hover:bg-red-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 flex items-center gap-2"
             >
               {uploading ? (
@@ -800,6 +885,11 @@ export default function TrackUpload({ userId, onSuccess }) {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Analyzing...
+                </>
+              ) : hasReachedLimit || isFreePlan ? (
+                <>
+                  <span>🔒</span>
+                  Upgrade to Upload
                 </>
               ) : (
                 <>

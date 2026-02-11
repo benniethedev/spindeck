@@ -299,16 +299,26 @@ export default function AdminDashboard({ user, profile, isPreviewOnly = false, p
                       <p className="text-sm opacity-80">{stats.totalUsers} total</p>
                     </div>
                   </button>
-                  <button
-                    onClick={() => setActiveTab("emails")}
+                  <a
+                    href="/admin/email"
                     className="flex items-center space-x-3 p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     <span className="text-2xl">📧</span>
                     <div className="text-left">
-                      <p className="font-medium">Send Blast</p>
-                      <p className="text-sm opacity-80">Email campaigns</p>
+                      <p className="font-medium">Email Subscribers</p>
+                      <p className="text-sm opacity-80">Send blasts</p>
                     </div>
-                  </button>
+                  </a>
+                  <a
+                    href="/admin/blog"
+                    className="flex items-center space-x-3 p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <span className="text-2xl">📝</span>
+                    <div className="text-left">
+                      <p className="font-medium">Blog Posts</p>
+                      <p className="text-sm opacity-80">Manage content</p>
+                    </div>
+                  </a>
                   <button
                     onClick={() => setActiveTab("analytics")}
                     className="flex items-center space-x-3 p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"

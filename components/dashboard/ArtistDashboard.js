@@ -457,6 +457,25 @@ export default function ArtistDashboard({ user, profile }) {
                       description="Track your performance"
                       onClick={() => setActiveTab("analytics")}
                     />
+                    {/* Public Profile Link */}
+                    {profile?.profile_slug && (
+                      <Link 
+                        href={`/artist/${profile.profile_slug}`}
+                        target="_blank"
+                        className="group relative flex items-center gap-4 p-5 rounded-xl transition-all duration-300 text-left w-full bg-spindeck-dark border border-gray-800/50 hover:border-gray-700 hover:bg-gray-800/50"
+                      >
+                        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-gray-800">
+                          <span className="text-2xl">👤</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-white mb-1">View Public Profile</p>
+                          <p className="text-sm text-spindeck-gray">Share your artist page</p>
+                        </div>
+                        <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </Link>
+                    )}
                   </div>
                 </section>
               </div>
