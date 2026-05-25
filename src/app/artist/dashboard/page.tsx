@@ -8,6 +8,9 @@ import SubmissionsList from '../components/SubmissionsList';
 import SubmissionsFilter from '../components/SubmissionsFilter';
 import PaymentVerification from '../components/PaymentVerification';
 
+// Prevent static prerendering - requires ArtistAuthProvider context
+export const dynamic = 'force-dynamic';
+
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; color: string; bg: string; dotColor: string }> = {
   pending: { label: 'Pending', color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40', dotColor: 'bg-amber-500' },
   approved: { label: 'Approved', color: 'text-green-700 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/40', dotColor: 'bg-green-500' },

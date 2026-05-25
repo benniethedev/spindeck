@@ -4,6 +4,9 @@ import { ArtistAuthProvider, useArtistAuth } from '../context/ArtistAuthContext'
 import ArtistNavbar from '../components/Navbar';
 import SubmissionForm from '../components/SubmissionForm';
 
+// Prevent static prerendering - requires context provider
+export const dynamic = 'force-dynamic';
+
 function SubmitPageContent() {
   const { isAuthenticated, loading } = useArtistAuth();
 

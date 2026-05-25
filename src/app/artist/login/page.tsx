@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useArtistAuth, ArtistAuthProvider } from '../context/ArtistAuthContext';
 
+// Prevent static prerendering - requires context provider
+export const dynamic = 'force-dynamic';
+
 function ArtistLoginContent() {
   const router = useRouter();
   const { login, loading: authLoading } = useArtistAuth();
