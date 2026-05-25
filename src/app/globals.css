@@ -95,3 +95,22 @@ html {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Additional utility classes used across components */
+.gradient-bg {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.gradient-bg-hover:hover {
+  background: linear-gradient(135deg, #6d28d9, #4338ca);
+}
+
+.focus-visible-ring {
+  outline: none;
+}
+
+.focus-visible-ring:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
