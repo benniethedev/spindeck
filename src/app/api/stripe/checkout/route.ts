@@ -2,6 +2,11 @@
  * Stripe Checkout Session endpoint
  * Creates a Stripe Checkout session for the selected artist package.
  * Handles all 3 pricing tiers: Starter ($29), Professional ($79), Enterprise ($199)
+ *
+ * Requirements:
+ * - POST body: { plan: 'starter'|'professional'|'enterprise', email?, name?, mode? }
+ * - Returns: { sessionId, url, plan, amount }
+ * - On failure: 400 (validation) or 500 (Stripe error)
  */
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -12,7 +17,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-const pricing = {
+const PRICING_PLANS = {
   starter: {
     priceId: process.env.STRIPE_PRICE_STARTER || '',
     name: 'Starter',
@@ -31,38 +36,38 @@ const pricing = {
     amount: 199,
     currency: 'usd' as const,
   },
-};
+} as const;
 
-type PlanKey = keyof typeof pricing;
+type PlanKey = keyof typeof PRICING_PLANS;
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { plan, email, name, mode: reqMode } = body as {
+    const { plan: rawPlan, email, name, mode: reqMode } = body as {
       plan?: string;
       email?: string;
       name?: string;
       mode?: string;
     };
 
-    const checkoutMode: 'payment' | 'subscription' =
-      reqMode === 'payment' ? 'payment' : 'subscription';
-
-    if (!plan || !(plan in pricing)) {
+    // Validate plan
+    if (!rawPlan || !(rawPlan in PRICING_PLANS)) {
       return NextResponse.json(
-        {
-          error: `Invalid or missing plan. Must be one of: starter, professional, enterprise.`,
-        },
+        { error: `Invalid or missing plan. Must be one of: starter, professional, enterprise.` },
         { status: 400 },
       );
     }
 
-    const planKey = plan as PlanKey;
-    const { priceId, name: planName, amount, currency } = pricing[planKey];
+    const planKey = rawPlan as PlanKey;
+    const { priceId, name: planName, amount, currency } = PRICING_PLANS[planKey];
 
-    // If no Stripe price ID configured, create one dynamically
+    // Determine checkout mode
+    const checkoutMode: 'payment' | 'subscription' =
+      reqMode === 'payment' ? 'payment' : 'subscription';
+
+    // Create or use existing Stripe price
     let effectivePriceId = priceId;
-    if (!priceId) {
+    if (!effectivePriceId) {
       try {
         const product = await stripe.products.create({
           name: `SpinRec ${planName} Plan`,
@@ -73,7 +78,7 @@ export async function POST(req: NextRequest) {
         const price = await stripe.prices.create({
           product: product.id,
           unit_amount: amount * 100,
-          currency: currency,
+          currency,
           recurring: checkoutMode === 'subscription' ? { interval: 'month' } : undefined,
           metadata: { plan: planKey },
         });
@@ -90,6 +95,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Validate email for subscriptions
     if (checkoutMode === 'subscription' && !email) {
       return NextResponse.json(
         { error: 'Email is required for subscription checkout.' },
@@ -97,6 +103,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Build metadata for session
     const metadata: Record<string, string> = {
       plan: planKey,
       priceId: effectivePriceId,
@@ -107,25 +114,24 @@ export async function POST(req: NextRequest) {
     if (email) metadata.email = email;
     if (name) metadata.artist_name = name;
 
+    // Success/cancel URLs
     const successUrl = `${BASE_URL}/welcome?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${BASE_URL}/payment-error?message=${encodeURIComponent('Payment was cancelled. You can try again anytime.')}`;
+    const cancelUrl = `${BASE_URL}/payment-error?message=${encodeURIComponent('Payment was cancelled. Your account was not created. You can try again anytime.')}`;
 
+    // Create checkout session
     const params: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       mode: checkoutMode,
-      line_items: [
-        {
-          price: effectivePriceId,
-          quantity: 1,
-        },
-      ],
-      customer_email: email || undefined,
-      metadata: metadata,
+      line_items: [{ price: effectivePriceId, quantity: 1 }],
+      customer_email: checkoutMode === 'subscription' ? email : undefined,
+      metadata,
       success_url: successUrl,
       cancel_url: cancelUrl,
       customer_creation: checkoutMode === 'subscription' ? 'always' : undefined,
       allow_promotion_codes: planKey !== 'enterprise',
       billing_address_collection: 'required',
+      // Pass email and name for auto-account creation
+      customer_update: checkoutMode === 'subscription' ? { address: 'auto' } : undefined,
     };
 
     const session = await stripe.checkout.sessions.create(params);
@@ -134,7 +140,7 @@ export async function POST(req: NextRequest) {
       sessionId: session.id,
       url: session.url,
       plan: planKey,
-      amount: amount,
+      amount,
     });
   } catch (err: unknown) {
     console.error('Stripe checkout error:', err);

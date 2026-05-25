@@ -1,6 +1,21 @@
 /**
  * Verify a Stripe Checkout session
- * Used after redirect from Stripe to confirm payment success
+ * Used after redirect from Stripe to confirm payment success.
+ * 
+ * GET /api/stripe/verify?session_id=cs_xxx
+ * 
+ * Returns:
+ * {
+ *   sessionId: string,
+ *   status: 'paid' | 'unpaid' | 'no_payment_required',
+ *   mode: 'payment' | 'subscription',
+ *   customerId: string,
+ *   subscriptionId: string | null,
+ *   plan: string | null,
+ *   customerEmail: string | null,
+ *   amountTotal: number | null,
+ *   currency: string | null
+ * }
  */
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -25,15 +40,15 @@ export async function GET(req: NextRequest) {
       sessionId: session.id,
       status: session.payment_status,
       mode: session.mode,
-      customerId: session.customer,
+      customerId: typeof session.customer === 'string' ? session.customer : String(session.customer),
       subscriptionId:
         typeof session.subscription === 'string'
           ? session.subscription
-          : session.subscription?.id,
-      plan: session.metadata?.plan,
-      customerEmail: session.customer_email,
-      amountTotal: session.amount_total,
-      currency: session.currency,
+          : session.subscription?.id ?? null,
+      plan: session.metadata?.plan ?? null,
+      customerEmail: session.customer_email ?? null,
+      amountTotal: session.amount_total ?? null,
+      currency: session.currency ?? null,
     };
 
     return NextResponse.json(data);
@@ -41,7 +56,7 @@ export async function GET(req: NextRequest) {
     console.error('Failed to verify Stripe session:', err);
     return NextResponse.json(
       { error: 'Failed to verify session' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
