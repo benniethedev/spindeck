@@ -21,7 +21,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     method,
     headers: getHeaders(),
   };
-  if (body && (method === 'POST' || method === 'PATCH')) {
+  if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
     opts.body = JSON.stringify(body);
   }
   const res = await fetch(url, opts);
