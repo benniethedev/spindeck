@@ -21,30 +21,30 @@ export async function createArtist(data: Omit<Artist, "id" | "createdAt" | "upda
     createdAt: now,
     updatedAt: now,
   });
-  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Artist;
+  return { ...record.data, id: record.id } as unknown as Artist;
 }
 
 export async function getArtist(slug: string): Promise<Artist | null> {
   const record = await getRecord(ARTIST_KEY(slug));
   if (!record) return null;
-  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Artist;
+  return { ...record.data, id: record.id } as unknown as Artist;
 }
 
 export async function getArtistById(id: string): Promise<Artist | null> {
   const record = await getRecordById(id);
   if (!record) return null;
-  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Artist;
+  return { ...record.data, id: record.id } as unknown as Artist;
 }
 
 export async function updateArtist(slug: string, updates: Partial<Artist>): Promise<Artist> {
   const record = await getRecord(ARTIST_KEY(slug));
   if (!record) throw new Error(`Artist not found: ${slug}`);
   const updated = await updateRecord(record.id, {
-    ...(record.data as Record<string, any>),
+    ...record.data,
     ...updates,
     updatedAt: new Date().toISOString(),
   });
-  return { ...(updated.data as Record<string, any>), id: updated.id } as unknown as Artist;
+  return { ...updated.data, id: updated.id } as unknown as Artist;
 }
 
 export async function deleteArtist(slug: string): Promise<void> {
@@ -57,10 +57,10 @@ export async function listArtists(genre?: Genre): Promise<Artist[]> {
   const params: Record<string, string> = {};
   if (genre) params.genre = genre;
   const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("artist", params);
-  return records.map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Artist));
+  return records.map(r => ({ ...r.data, id: r.id } as unknown as Artist));
 }
 
 export async function listActiveArtists(): Promise<Artist[]> {
   const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("artist", { status: "active" });
-  return records.map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Artist));
+  return records.map(r => ({ ...r.data, id: r.id } as unknown as Artist));
 }

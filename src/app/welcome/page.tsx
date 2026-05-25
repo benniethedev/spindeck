@@ -7,7 +7,6 @@ function WelcomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-<<<<<<< Updated upstream
   const [verified, setVerified] = useState(false);
   const [sessionData, setSessionData] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,41 +37,6 @@ function WelcomeContent() {
       setVerified(true);
       setLoading(false);
     }
-=======
-  const [sessionData, setSessionData] = useState<{ customerId?: string; subscriptionId?: string; plan?: string; status?: string; amountTotal?: number; currency?: string; sessionId?: string; customerEmail?: string } | null>(null);
-  const [verified, setVerified] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const sessionId = searchParams.get('session_id');
-    if (!sessionId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    setVerified(null);
-    // Verify the checkout session with Stripe
-    fetch(`/api/stripe/verify?session_id=${encodeURIComponent(sessionId)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled) return;
-        if (data.error) {
-          setVerified(false);
-        } else {
-          setSessionData(data);
-          setVerified(true);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to verify session:', err);
-        if (!cancelled) setVerified(false);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
->>>>>>> Stashed changes
   }, [searchParams]);
 
   if (loading) {
@@ -143,11 +107,7 @@ function WelcomeContent() {
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Plan</span>
                 <span className="font-medium text-zinc-900 dark:text-white capitalize">
-<<<<<<< Updated upstream
                   {String((sessionData as any).plan || 'N/A')}
-=======
-                  {((sessionData as Record<string, unknown>).plan as string || 'N/A')}
->>>>>>> Stashed changes
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
@@ -157,17 +117,12 @@ function WelcomeContent() {
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Customer ID</span>
                 <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">
-<<<<<<< Updated upstream
                   {(sessionData as any).customerId || 'N/A'}
-=======
-                  {(sessionData ? String(sessionData.customerId || 'N/A') : 'N/A')}
->>>>>>> Stashed changes
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Subscription ID</span>
                 <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">
-<<<<<<< Updated upstream
                   {(sessionData as any).subscriptionId || 'N/A'}
                 </span>
               </div>
@@ -177,9 +132,6 @@ function WelcomeContent() {
                   {((sessionData as any).amountTotal
                     ? `$${(sessionData as any).amountTotal / 100} ${(sessionData as any).currency?.toUpperCase()}`
                     : 'N/A')}
-=======
-                  {(sessionData ? String(sessionData.subscriptionId || 'N/A') : 'N/A')}
->>>>>>> Stashed changes
                 </span>
               </div>
             </div>

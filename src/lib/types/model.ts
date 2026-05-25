@@ -25,13 +25,7 @@ export type Status =
   | "active"
   | "archived"
   | "completed"
-  | "cancelled"
-  | "draft"
-  | "scheduled"
-  | "sending"
-  | "sent"
-  | "failed"
-  | "refunded";
+  | "cancelled";
 
 export type Genre =
   | "hip-hop"
@@ -152,7 +146,6 @@ export const TRACK_KEY = (id: string) => `track:${id}`;
 // ---------------------------------------------------------------------------
 
 export interface Purchase extends BaseEntity {
-  id: string;
   stripePaymentId: string; // payment_intent or checkout session ID
   stripeCustomerId: string;
   amount: number; // in cents

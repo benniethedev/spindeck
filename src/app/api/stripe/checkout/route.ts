@@ -1,11 +1,7 @@
 /**
  * Stripe Checkout Session endpoint
  * Creates a Stripe Checkout session for the selected artist package.
-<<<<<<< Updated upstream
  * Handles all 3 pricing tiers: Starter ($29), Professional ($79), Enterprise ($199)
-=======
- * Supports both POST (with JSON body for email/name) and GET (with query params).
->>>>>>> Stashed changes
  */
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -37,56 +33,16 @@ const pricing = {
   },
 };
 
-<<<<<<< Updated upstream
 type PlanKey = keyof typeof pricing;
-=======
-function getBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-}
-
-function buildSuccessUrl(sessionId: string, email?: string): string {
-  let url = `${getBaseUrl()}/welcome?session_id=${encodeURIComponent(sessionId)}`;
-  if (email) {
-    url += `&email=${encodeURIComponent(email)}`;
-  }
-  return url;
-}
->>>>>>> Stashed changes
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-<<<<<<< Updated upstream
     const { plan, email, name, mode: reqMode } = body as {
       plan?: string;
       email?: string;
       name?: string;
       mode?: string;
-=======
-    const { plan, email, name }: { plan?: string; email?: string; name?: string } = body || {};
-
-    if (!plan || !pricing[plan as keyof typeof pricing]) {
-      return NextResponse.json(
-        { error: 'Invalid or missing plan. Must be one of: starter, professional, enterprise.' },
-        { status: 400 },
-      );
-    }
-
-    const { priceId, name: planName } = pricing[plan as keyof typeof pricing];
-
-    if (!priceId) {
-      return NextResponse.json(
-        { error: `Stripe price ID not configured for plan: ${planName}` },
-        { status: 500 },
-      );
-    }
-
-    // Build metadata for webhook processing
-    const metadata: Record<string, string> = {
-      plan,
-      ...(email ? { email } : {}),
-      ...(name ? { artist_name: name } : {}),
->>>>>>> Stashed changes
     };
 
     const checkoutMode: 'payment' | 'subscription' =
@@ -163,7 +119,6 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
-<<<<<<< Updated upstream
       customer_email: email || undefined,
       metadata: metadata,
       success_url: successUrl,
@@ -180,71 +135,16 @@ export async function POST(req: NextRequest) {
       url: session.url,
       plan: planKey,
       amount: amount,
-=======
-      customer_email: email,
-      metadata,
-      success_url: buildSuccessUrl('{CHECKOUT_SESSION_ID}', email),
-      cancel_url: `${getBaseUrl()}/payment-error?message=${encodeURIComponent('Payment was cancelled. You can try again anytime.')}`,
->>>>>>> Stashed changes
     });
   } catch (err: unknown) {
     console.error('Stripe checkout error:', err);
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(
-<<<<<<< Updated upstream
       { error: 'Failed to create checkout session: ' + message },
-=======
-      { error: 'Failed to create checkout session' },
->>>>>>> Stashed changes
       { status: 500 },
     );
   }
 }
 
-<<<<<<< Updated upstream
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-=======
-export async function GET(req: NextRequest) {
-  const plan = req.nextUrl.searchParams.get('plan') as string;
-
-  if (!plan || !pricing[plan as keyof typeof pricing]) {
-    return NextResponse.json(
-      { error: 'Invalid or missing plan. Must be one of: starter, professional, enterprise.' },
-      { status: 400 },
-    );
-  }
-
-  const { priceId, name: planName } = pricing[plan as keyof typeof pricing];
-
-  if (!priceId) {
-    return NextResponse.json(
-      { error: `Stripe price ID not configured for plan: ${planName}` },
-      { status: 500 },
-    );
-  }
-
-  // For GET requests, redirect directly to Stripe Checkout
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'subscription',
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
-    metadata: { plan },
-    success_url: `${getBaseUrl()}/welcome?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${getBaseUrl()}/payment-error?message=${encodeURIComponent('Payment was cancelled. You can try again anytime.')}`,
-  });
-
-  if (!session.url) {
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 },
-    );
-  }
-  return NextResponse.redirect(session.url);
-}
->>>>>>> Stashed changes
