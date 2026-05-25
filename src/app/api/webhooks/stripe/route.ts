@@ -203,6 +203,7 @@ async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
     } else if (subscription && typeof subscription === 'object') {
       subDetails = subscription as Stripe.Subscription;
     }
+<<<<<<< Updated upstream
     const customerEmail = (subDetails as any)?.customer_email || email;
     const stripeCustomerId = typeof customer === 'string' ? customer : sessionId;
     const artistKey = 'artist:' + stripeCustomerId;
@@ -211,6 +212,26 @@ async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
     const artistData: Record<string, unknown> = {
       id: stripeCustomerId,
       name: artistName || customerEmail,
+=======
+
+    // Get customer email from Stripe customer object or subscription
+    let customerEmail = email || session.customer_email || '';
+    if (subDetails?.customer && typeof subDetails.customer === 'string') {
+      try {
+        const customer = await stripe.customers.retrieve(subDetails.customer);
+        customerEmail = ((customer as { email?: string })?.email) || customerEmail;
+      } catch {
+        // Fall back to session metadata
+      }
+    }
+    const customerId = customer || sessionId;
+
+    // Create Artist record in StoreAI
+    const artistKey = 'artist:' + customerId;
+    const artistData = {
+      id: customerId,
+      name: artistName,
+>>>>>>> Stashed changes
       email: customerEmail,
       plan: plan,
       status: 'active',
