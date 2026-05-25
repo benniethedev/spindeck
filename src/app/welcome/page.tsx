@@ -1,29 +1,40 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function WelcomeContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [verified, setVerified] = useState(false);
   const [sessionData, setSessionData] = useState<Record<string, unknown> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     if (sessionId) {
       // Verify the checkout session with Stripe
-      fetch(`/api/stripe/verify?session_id=${sessionId}`)
+      fetch(`/api/stripe/verify?session_id=${encodeURIComponent(sessionId)}`)
         .then((res) => res.json())
         .then((data) => {
+          if (data.error) {
+            setError(data.error);
+            return;
+          }
           setSessionData(data);
+          setVerified(data.status === 'paid');
         })
         .catch((err) => {
           console.error('Failed to verify session:', err);
+          setError('Could not verify your payment. Please contact support.');
         })
         .finally(() => {
           setLoading(false);
         });
     } else {
+      // No session_id — treat as direct access
+      setVerified(true);
       setLoading(false);
     }
   }, [searchParams]);
@@ -34,6 +45,32 @@ function WelcomeContent() {
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-zinc-600 dark:text-zinc-400">Verifying your payment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="max-w-lg w-full text-center px-6">
+          <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto mb-8 flex items-center justify-center">
+            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">
+            Payment Verification Failed
+          </h1>
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-10">{error}</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/#pricing"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-base hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/25"
+            >
+              Try Again
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -63,13 +100,15 @@ function WelcomeContent() {
         </div>
 
         {/* Artist Details */}
-        {sessionData && (
+        {sessionData && verified && (
           <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 bg-white dark:bg-zinc-950 mb-12">
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-6">Account Details</h2>
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Plan</span>
-                <span className="font-medium text-zinc-900 dark:text-white capitalize">{(sessionData as any).plan || 'N/A'}</span>
+                <span className="font-medium text-zinc-900 dark:text-white capitalize">
+                  {String((sessionData as any).plan || 'N/A')}
+                </span>
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Status</span>
@@ -77,11 +116,23 @@ function WelcomeContent() {
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Customer ID</span>
-                <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">{(sessionData as any).customerId || 'N/A'}</span>
+                <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">
+                  {(sessionData as any).customerId || 'N/A'}
+                </span>
               </div>
               <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
                 <span className="text-zinc-500 dark:text-zinc-400">Subscription ID</span>
-                <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">{(sessionData as any).subscriptionId || 'N/A'}</span>
+                <span className="font-mono text-xs text-zinc-900 dark:text-zinc-300">
+                  {(sessionData as any).subscriptionId || 'N/A'}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
+                <span className="text-zinc-500 dark:text-zinc-400">Amount Paid</span>
+                <span className="font-medium text-zinc-900 dark:text-white">
+                  {((sessionData as any).amountTotal
+                    ? `$${(sessionData as any).amountTotal / 100} ${(sessionData as any).currency?.toUpperCase()}`
+                    : 'N/A')}
+                </span>
               </div>
             </div>
           </div>
@@ -124,7 +175,7 @@ function WelcomeContent() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="#/submit"
+            href="/artist/submit"
             className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-base hover:from-violet-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-violet-500/25"
           >
             Submit Your First Track
@@ -155,3 +206,5 @@ export default function WelcomePage() {
     </Suspense>
   );
 }
+
+export const dynamic = 'force-dynamic';

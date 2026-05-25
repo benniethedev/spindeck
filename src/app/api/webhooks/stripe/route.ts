@@ -1,20 +1,98 @@
 /**
  * Stripe Webhook endpoint
- * Handles Stripe events: checkout.session.completed, payment_intent.succeeded,
- * invoice.payment_failed, checkout.session.expired
+ * Handles Stripe events: checkout.session.completed, invoice.payment_failed, checkout.session.canceled
  * On success: auto-creates Artist record in StoreAI DB
- * On failure: logs error for downstream handling
+ * On failure: returns 400 for verification errors; payment failures logged for downstream handling
  */
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { createRecord } from '@/lib/storeai';
+import { createRecord, updateRecord, getRecord } from '@/lib/storeai';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2026-04-22.dahlia',
 });
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+type EventHandler = (event: Stripe.Event) => Promise<void>;
+
+const handlers: Record<string, EventHandler> = {
+  'checkout.session.completed': async (event) => {
+    const session = event.data.object as Stripe.Checkout.Session;
+    await handlePaymentSuccess(session);
+  },
+  'checkout.session.canceled': async (event) => {
+    const session = event.data.object as Stripe.Checkout.Session;
+    console.log('Checkout session canceled:', session.id, 'metadata:', session.metadata);
+  },
+  'invoice.payment_failed': async (event) => {
+    const invoice = event.data.object as any;
+    const subId = typeof invoice.subscription === 'string'
+      ? invoice.subscription
+      : invoice.subscription && (invoice.subscription as any).id;
+
+    if (subId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(subId);
+        const plan = (sub as any).metadata && (sub as any).metadata.plan ? (sub as any).metadata.plan : 'unknown';
+        const email = (sub as any).customer_email ? (sub as any).customer_email : '';
+        console.error('Payment failed for invoice:', invoice.id, 'plan:', plan, 'email:', email);
+
+        const failureKey = 'payment_failure:' + invoice.id;
+        await createRecord(failureKey, {
+          id: invoice.id,
+          type: 'payment_failed',
+          plan: plan,
+          email: email,
+          stripeInvoiceId: invoice.id,
+          stripeSubscriptionId: subId,
+          failureReason: invoice.collection_behavior || '',
+          occurredAt: new Date().toISOString(),
+        });
+      } catch (subErr) {
+        console.error('Could not retrieve subscription for failed payment:', subErr);
+      }
+    }
+  },
+  'payment_intent.succeeded': async (event) => {
+    const pi = event.data.object as Stripe.PaymentIntent;
+    console.log('PaymentIntent succeeded:', pi.id, 'for customer:', pi.customer);
+  },
+  'checkout.session.expired': async (event) => {
+    const session = event.data.object as Stripe.Checkout.Session;
+    console.log('Checkout session expired:', session.id);
+  },
+  'customer.subscription.created': async (event) => {
+    const sub = event.data.object as Stripe.Subscription;
+    console.log('Subscription created:', sub.id, 'status:', sub.status, 'customer:', sub.customer);
+  },
+  'customer.subscription.updated': async (event) => {
+    const sub = event.data.object as Stripe.Subscription;
+    console.log('Subscription updated:', sub.id, 'status:', sub.status);
+  },
+  'customer.subscription.deleted': async (event) => {
+    const sub = event.data.object as Stripe.Subscription;
+    console.warn('Subscription deleted:', sub.id, 'customer:', sub.customer);
+    const customerId = typeof sub.customer === 'string' ? sub.customer : '';
+    if (customerId) {
+      try {
+        const artistKey = 'artist:' + customerId;
+        const existing = await getRecord(artistKey);
+        if (existing) {
+          await updateRecord(existing.id, {
+            status: 'cancelled',
+            stripeSubscriptionId: '',
+            isActive: false,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      } catch (updateErr) {
+        console.warn('Could not update artist record on subscription deletion:', updateErr);
+      }
+    }
+  },
+};
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -33,45 +111,13 @@ export async function POST(req: Request) {
     );
   }
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
-      await handlePaymentSuccess(session);
-      break;
-    }
+  const eventType = event.type;
+  const handler = handlers[eventType];
 
-    case 'payment_intent.succeeded': {
-      const pi = event.data.object as Stripe.PaymentIntent;
-      console.log('Payment succeeded:', pi.id, 'for customer:', pi.customer);
-      break;
-    }
-
-    case 'invoice.payment_failed': {
-      const invoice = event.data.object as Stripe.Invoice;
-      console.error('Payment failed for invoice:', invoice.id, 'customer:', invoice.customer);
-      break;
-    }
-
-    case 'checkout.session.expired': {
-      const session = event.data.object as Stripe.Checkout.Session;
-      console.log('Checkout session expired:', session.id);
-      break;
-    }
-
-    case 'customer.subscription.created': {
-      const sub = event.data.object as Stripe.Subscription;
-      console.log('Subscription created:', sub.id, 'status:', sub.status);
-      break;
-    }
-
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object as Stripe.Subscription;
-      console.warn('Subscription deleted:', sub.id);
-      break;
-    }
-
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+  if (handler) {
+    await handler(event);
+  } else {
+    console.log('Unhandled event type: ' + eventType);
   }
 
   return NextResponse.json({ received: true });
@@ -82,13 +128,15 @@ export async function POST(req: Request) {
  */
 async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
   try {
-    const { id: sessionId, customer, metadata, subscription } = session;
+    const sessionId = session.id;
+    const customer = session.customer;
+    const metadata = session.metadata;
+    const subscription = session.subscription;
 
-    const plan = metadata?.plan || 'starter';
-    const email = (metadata?.email as string) || '';
-    const artistName = (metadata?.artist_name as string) || '';
+    const plan = metadata && metadata.plan ? metadata.plan : 'starter';
+    const email = metadata && metadata.email ? metadata.email : '';
+    const artistName = metadata && metadata.artist_name ? metadata.artist_name : '';
 
-    // Fetch full subscription details
     let subDetails: Stripe.Subscription | undefined;
     if (subscription && typeof subscription === 'string') {
       subDetails = await stripe.subscriptions.retrieve(subscription);
@@ -96,74 +144,66 @@ async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
       subDetails = subscription as Stripe.Subscription;
     }
 
-    // Get customer email from subscription or session
     const customerEmail =
-      ((subDetails as any)?.customer_email as string) ||
-      (session.customer_email as string) ||
+      (subDetails as any).customer_email ||
+      session.customer_email ||
       email;
-    const customerId = customer || sessionId;
 
-    // Create Artist record in StoreAI
-    const artistKey = `artist:${customerId}`;
-    const artistData = {
-      id: customerId,
+    const stripeCustomerId =
+      (typeof customer === 'string' && customer) ||
+      (typeof session.customer === 'string' && session.customer) ||
+      sessionId;
+
+    const artistKey = 'artist:' + stripeCustomerId;
+    let existingArtist: any = null;
+    try {
+      existingArtist = await getRecord(artistKey);
+    } catch (_) {
+      // Record does not exist yet
+    }
+
+    const artistData: Record<string, unknown> = {
+      id: stripeCustomerId,
       name: artistName,
       email: customerEmail,
       plan: plan,
       status: 'active',
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subDetails?.id || '',
-      stripePriceId: subDetails?.items?.data[0]?.price?.id || '',
-      createdAt: new Date().toISOString(),
+      stripeCustomerId: stripeCustomerId,
+      stripeSubscriptionId: subDetails ? subDetails.id : '',
+      stripePriceId: subDetails ? (subDetails as any).items?.data?.[0]?.price?.id : '',
+      subscriptionStatus: subDetails ? subDetails.status : 'active',
+      subscriptionCurrentPeriodEnd: subDetails && (subDetails as any).current_period_end
+        ? new Date((subDetails as any).current_period_end * 1000).toISOString()
+        : '',
+      createdAt: existingArtist && (existingArtist.data as any).createdAt ? (existingArtist.data as any).createdAt : new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      submissionCount: 0,
+      submissionCount: existingArtist && (existingArtist.data as any).submissionCount ? (existingArtist.data as any).submissionCount : 0,
       isActive: true,
     };
 
-    const created = await createRecord(artistKey, artistData);
-    console.log('Artist record created in DB:', created.key, 'for plan:', plan);
-
-    // If customer already exists, update their record
-    if (customer && typeof customer === 'string' && customer.startsWith('cus_')) {
-      try {
-        await fetch(
-          `${process.env.STOREAI_BASE_URL || 'https://db.netswagger.com'}/api/records?key=${encodeURIComponent(`artist:${customer}`)}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${process.env.STOREAI_API_KEY || ''}`,
-              'Content-Type': 'application/json',
-              'X-Project-ID': process.env.STOREAI_PROJECT_ID || '',
-            },
-            body: JSON.stringify({
-              data: {
-                ...artistData,
-                updatedAt: new Date().toISOString(),
-                stripeSubscriptionId: subDetails?.id || '',
-                status: 'active',
-              },
-            }),
-          }
-        );
-      } catch (updateErr) {
-        console.warn('Failed to update existing customer record:', updateErr);
-      }
+    let result;
+    if (existingArtist) {
+      result = await updateRecord(existingArtist.id, artistData);
+      console.log('Artist record updated in DB: ' + result.key + ' for plan: ' + plan);
+    } else {
+      result = await createRecord(artistKey, artistData);
+      console.log('Artist record created in DB: ' + result.key + ' for plan: ' + plan);
     }
 
-    // Track subscription event in StoreAI
-    const eventKey = `subscription:${sessionId}`;
+    const eventKey = 'subscription:' + sessionId;
     const eventRecord = {
       id: sessionId,
       type: 'payment_success',
       plan: plan,
       stripeSessionId: sessionId,
-      stripeSubscriptionId: subDetails?.id || '',
+      stripeSubscriptionId: subDetails ? subDetails.id : '',
+      stripeCustomerId: stripeCustomerId,
       customerEmail: customerEmail,
       occurredAt: new Date().toISOString(),
     };
     await createRecord(eventKey, eventRecord);
 
-    console.log(`Successfully handled payment_success for plan: ${plan}, session: ${sessionId}`);
+    console.log('Successfully handled payment_success for plan: ' + plan + ', session: ' + sessionId + ', artist: ' + artistKey);
   } catch (err) {
     console.error('Error handling payment success:', err);
   }

@@ -1,5 +1,7 @@
 /**
  * Pricing - Three main pricing tiers with Stripe integration
+ * Includes an inline email/name collection form for non-authenticated users
+ * before redirecting to Stripe Checkout.
  */
 'use client';
 
@@ -75,10 +77,16 @@ const plans: Plan[] = [
 ];
 
 /**
- * Initiate Stripe checkout for the selected plan.
- * Shows loading state and redirects to Stripe hosted checkout page.
+ * Collect user email/name, then create Stripe Checkout session and redirect.
  */
-async function initiateCheckout(planKey: string, onLoading: (loading: boolean) => void, onPlan: (plan: string) => void) {
+async function initiateCheckout(
+  planKey: string,
+  email: string,
+  name: string,
+  onLoading: (loading: boolean) => void,
+  onPlan: (plan: string) => void,
+  onError: (msg: string) => void
+) {
   onLoading(true);
   onPlan(planKey);
 
@@ -86,7 +94,12 @@ async function initiateCheckout(planKey: string, onLoading: (loading: boolean) =
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: planKey, mode: 'subscription' }),
+      body: JSON.stringify({
+        plan: planKey,
+        mode: 'subscription',
+        email,
+        name,
+      }),
     });
 
     const data = await res.json();
@@ -96,19 +109,133 @@ async function initiateCheckout(planKey: string, onLoading: (loading: boolean) =
     }
 
     if (data.url) {
+      // Store the session ID in sessionStorage for the welcome page
+      sessionStorage.setItem('pending_stripe_session', data.sessionId);
       window.location.href = data.url;
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'An unexpected error occurred';
-    window.location.href = `/payment-error?message=${encodeURIComponent(message)}`;
-  } finally {
+    onError(message);
     onLoading(false);
   }
+}
+
+/**
+ * Inline signup form that collects email + name before Stripe checkout.
+ */
+function CheckoutForm({
+  plan,
+  onClose,
+}: {
+  plan: (typeof plans)[0];
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!email || !name.trim()) {
+      setError('Email and artist name are required.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    initiateCheckout(plan.planKey, email, name.trim(), setLoading, () => {}, setError);
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          Setting up your checkout...
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+          Choose your <span className="text-violet-600 dark:text-violet-400">{plan.name}</span> plan
+        </h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          {plan.price}{plan.period} — Enter your details to get started
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="checkout-name" className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
+            Artist / Stage Name
+          </label>
+          <input
+            id="checkout-name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition-all"
+            placeholder="Your artist name"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="checkout-email" className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
+            Email Address
+          </label>
+          <input
+            id="checkout-email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition-all"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 shadow-lg shadow-violet-500/25 transition-all duration-200"
+        >
+          Continue to Payment →
+        </button>
+
+        <p className="text-center text-xs text-zinc-400 dark:text-zinc-500">
+          Secure payment powered by Stripe
+        </p>
+      </form>
+
+      <button
+        onClick={onClose}
+        className="mt-3 w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+      >
+        ← Back to pricing
+      </button>
+    </div>
+  );
 }
 
 export default function Pricing() {
   const [loading, setLoading] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<(typeof plans)[0] | null>(null);
 
   return (
     <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-zinc-950">
@@ -125,6 +252,27 @@ export default function Pricing() {
             Choose the plan that fits your goals. Upgrade or downgrade anytime. No hidden fees.
           </p>
         </div>
+
+        {/* Overlay for checkout form */}
+        {selectedPlan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 shadow-2xl border border-zinc-200 dark:border-zinc-800 p-8 relative">
+              <button
+                onClick={() => setSelectedPlan(null)}
+                className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <CheckoutForm
+                plan={selectedPlan}
+                onClose={() => setSelectedPlan(null)}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Pricing cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
@@ -222,7 +370,7 @@ export default function Pricing() {
                 </a>
               ) : (
                 <button
-                  onClick={() => initiateCheckout(plan.planKey, setLoading, setLoadingPlan)}
+                  onClick={() => setSelectedPlan(plan)}
                   disabled={loading}
                   className={`block w-full text-center font-semibold px-6 py-3.5 rounded-full transition-all duration-200 ${
                     plan.highlighted
@@ -231,7 +379,7 @@ export default function Pricing() {
                   }`}
                 >
                   {loading && loadingPlan === plan.planKey
-                    ? 'Redirecting...'
+                    ? 'Processing...'
                     : plan.cta}
                 </button>
               )}
