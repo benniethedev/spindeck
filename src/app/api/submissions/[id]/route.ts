@@ -1,9 +1,9 @@
 /**
- * PATCH /api/submissions/[id]
- * Updates a submission (e.g., status changes by admin).
+ * PATCH /api/submissions/[id] - Update a submission
+ * DELETE /api/submissions/[id] - Delete a submission
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { getRecordById, updateRecord } from '@/lib/storeai';
+import { getRecordById, updateRecord, deleteRecord } from '@/lib/storeai';
 import { SubmissionStatus } from '@/types';
 
 async function getSession(req: NextRequest) {
@@ -56,6 +56,34 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     console.error('Update submission error:', err);
     return NextResponse.json(
       { error: 'Failed to update submission' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    const params = await ctx.params;
+    const { id } = params;
+
+    // Verify admin authentication
+    const token = req.cookies.get('admin_session')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const existing = await getRecordById(id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
+    }
+
+    await deleteRecord(id);
+
+    return NextResponse.json({ success: true, message: 'Submission deleted' });
+  } catch (err) {
+    console.error('Delete submission error:', err);
+    return NextResponse.json(
+      { error: 'Failed to delete submission' },
       { status: 500 }
     );
   }
