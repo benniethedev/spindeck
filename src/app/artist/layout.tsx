@@ -5,6 +5,7 @@
 import type { Metadata } from "next";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateSoftwareApplicationJsonLd, generateBreadcrumbJsonLd } from '@/app/lib/structured-data';
 import Navbar from './components/Navbar';
+import { ArtistAuthProvider } from './context/ArtistAuthContext';
 
 export const metadata: Metadata = {
   title: "Artist Portal — Promote Your Music to Top DJs | SpinRec",
@@ -39,13 +40,15 @@ export const metadata: Metadata = {
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <Navbar />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateOrganizationJsonLd() }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateWebSiteJsonLd() }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateSoftwareApplicationJsonLd() }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateBreadcrumbJsonLd() }} />
-      {children}
-    </div>
+    <ArtistAuthProvider>
+      <div className="min-h-screen bg-white dark:bg-zinc-950">
+        <Navbar />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateOrganizationJsonLd() }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateWebSiteJsonLd() }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateSoftwareApplicationJsonLd() }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: generateBreadcrumbJsonLd() }} />
+        {children}
+      </div>
+    </ArtistAuthProvider>
   );
 }

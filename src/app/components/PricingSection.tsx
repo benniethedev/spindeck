@@ -115,7 +115,7 @@ function PlanModal({
 }: {
   plan: Package;
   onClose: () => void;
-  onCheckout: (email: string, name: string) => void;
+  onCheckout: (pkg: Package, email: string, name: string) => void;
 }) {
   const [email, setEmail] = useState('');
   const [artistName, setArtistName] = useState('');
@@ -140,7 +140,7 @@ function PlanModal({
     }
 
     setSubmitting(true);
-    onCheckout(email.trim(), artistName.trim());
+    onCheckout(plan, email.trim(), artistName.trim());
   };
 
   return (
