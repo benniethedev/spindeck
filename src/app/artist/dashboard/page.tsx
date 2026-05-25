@@ -6,6 +6,7 @@ import { ArtistAuthProvider, useArtistAuth } from '../context/ArtistAuthContext'
 import type { Submission, SubmissionStatus } from '@/types';
 import SubmissionsList from '../components/SubmissionsList';
 import SubmissionsFilter from '../components/SubmissionsFilter';
+import PaymentVerification from '../components/PaymentVerification';
 
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; color: string; bg: string; dotColor: string }> = {
   pending: { label: 'Pending', color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40', dotColor: 'bg-amber-500' },
@@ -28,6 +29,12 @@ function DashboardContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
+  const currentMonth = new Date().toISOString().slice(0, 7);
+
+  const currentUsage = submissions.filter((s) => {
+    return s.createdAt && s.createdAt.slice(0, 7) === currentMonth;
+  }).length;
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -42,7 +49,7 @@ function DashboardContent() {
     setRefreshing(true);
     try {
       const res = await fetch('/api/submissions', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: 'Bearer ' + token },
       });
       if (res.ok) {
         const data = await res.json();
@@ -123,14 +130,13 @@ function DashboardContent() {
           </a>
           <button onClick={fetchSubmissions} disabled={refreshing}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all disabled:opacity-50">
-            <svg className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={"w-4 h-4 " + (refreshing ? 'animate-spin' : '')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Refresh
           </button>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {[
             { label: 'Total', value: stats.total, color: 'text-zinc-900 dark:text-white' },
@@ -141,12 +147,19 @@ function DashboardContent() {
           ].map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 card-hover transition-all">
               <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">{stat.label}</p>
-              <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
+              <p className={"text-3xl font-bold " + stat.color}>{stat.value}</p>
             </div>
           ))}
         </div>
 
-        {/* Submission Lifecycle Visual */}
+        <div className="mb-8">
+          <PaymentVerification
+            userId={user?.id || ''}
+            userPlan={user?.plan || 'free'}
+            currentUsage={currentUsage}
+          />
+        </div>
+
         <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 mb-8">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">Submission Lifecycle</h2>
           <div className="flex items-center gap-2 flex-wrap">
@@ -154,8 +167,8 @@ function DashboardContent() {
               const config = STATUS_CONFIG[status];
               return (
                 <div key={status} className="flex items-center gap-2">
-                  <div className={`rounded-xl px-4 py-2.5 border ${config.bg} ${config.color} text-sm font-medium flex items-center gap-1.5`}>
-                    <span className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+                  <div className={"rounded-xl px-4 py-2.5 border " + config.bg + " " + config.color + " text-sm font-medium flex items-center gap-1.5"}>
+                    <span className={"w-2 h-2 rounded-full " + config.dotColor} />
                     {config.label}
                     {stats.total > 0 && (
                       <span className="ml-1 px-1.5 py-0.5 rounded bg-white/50 dark:bg-black/30 text-xs font-bold">
@@ -174,12 +187,10 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Filter */}
         <div className="mb-4">
           <SubmissionsFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
         </div>
 
-        {/* Submissions List */}
         <SubmissionsList submissions={submissions} loading={fetching}
           onRefresh={fetchSubmissions}
           filterStatus={activeFilter as SubmissionStatus | 'all'} />
