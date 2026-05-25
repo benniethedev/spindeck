@@ -1,53 +1,34 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
+import { Dispatch, SetStateAction } from "react";
 
-export interface FilterState {
+export interface DJFilterState {
   genre: string;
   mood: string;
   bpmMin: number;
   bpmMax: number;
   search: string;
-  sortBy: "name" | "bpm" | "artist";
 }
 
-const DEFAULT_FILTERS: FilterState = {
-  genre: "All",
-  mood: "All",
-  bpmMin: 0,
-  bpmMax: 999,
-  search: "",
-  sortBy: "name",
-};
-
 interface DJFilterContextType {
-  filters: FilterState;
-  setFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
-  resetFilters: () => void;
+  filters: DJFilterState;
+  setFilters: Dispatch<SetStateAction<DJFilterState>>;
 }
 
 const DJFilterContext = createContext<DJFilterContextType | undefined>(undefined);
 
-export function DJFilterProvider({ children }: { children: ReactNode }) {
-  const [filters, setFiltersState] = useState<FilterState>(DEFAULT_FILTERS);
-
-  const setFilters = useCallback(
-    (updater: FilterState | ((prev: FilterState) => FilterState)) => {
-      setFiltersState((prev) =>
-        typeof updater === "function"
-          ? (updater as (prev: FilterState) => FilterState)(prev)
-          : updater
-      );
-    },
-    []
-  );
-
-  const resetFilters = useCallback(() => {
-    setFiltersState(DEFAULT_FILTERS);
-  }, []);
+export function DJFilterProvider({ children }: { children: React.ReactNode }) {
+  const [filters, setFilters] = useState<DJFilterState>({
+    genre: "All",
+    mood: "All",
+    bpmMin: 0,
+    bpmMax: 999,
+    search: "",
+  });
 
   return (
-    <DJFilterContext.Provider value={{ filters, setFilters, resetFilters }}>
+    <DJFilterContext.Provider value={{ filters, setFilters }}>
       {children}
     </DJFilterContext.Provider>
   );
