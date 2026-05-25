@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+Disallow: /checkout
+
+# Host
+Host: https://spinrec.com
+
+# Sitemaps
+Sitemap: https://spinrec.com/sitemap.xml
