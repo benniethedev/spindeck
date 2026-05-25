@@ -21,30 +21,30 @@ export async function createArtist(data: Omit<Artist, "id" | "createdAt" | "upda
     createdAt: now,
     updatedAt: now,
   });
-  return { ...record.data, id: record.id } as unknown as Artist;
+  return { ...record.data as Record<string, any>, id: record.id } as unknown as Artist;
 }
 
 export async function getArtist(slug: string): Promise<Artist | null> {
   const record = await getRecord(ARTIST_KEY(slug));
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Artist;
+  return { ...record.data as Record<string, any>, id: record.id } as unknown as Artist;
 }
 
 export async function getArtistById(id: string): Promise<Artist | null> {
   const record = await getRecordById(id);
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Artist;
+  return { ...record.data as Record<string, any>, id: record.id } as unknown as Artist;
 }
 
 export async function updateArtist(slug: string, updates: Partial<Artist>): Promise<Artist> {
   const record = await getRecord(ARTIST_KEY(slug));
   if (!record) throw new Error(`Artist not found: ${slug}`);
   const updated = await updateRecord(record.id, {
-    ...record.data,
+    ...record.data as Record<string, any>,
     ...updates,
     updatedAt: new Date().toISOString(),
   });
-  return { ...updated.data, id: updated.id } as unknown as Artist;
+  return { ...updated.data as Record<string, any>, id: updated.id } as unknown as Artist;
 }
 
 export async function deleteArtist(slug: string): Promise<void> {
