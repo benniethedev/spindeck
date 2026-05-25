@@ -1,61 +1,66 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setError('');
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+    if (!name.trim()) { setError('Artist name is required'); return; }
+    if (!email.trim()) { setError('Email is required'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
 
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Signup failed");
+        setError(data.error || 'Signup failed');
         return;
       }
 
       setSuccess(true);
-      // Auto-login: store session
-      localStorage.setItem("spin_token", `spin_${Date.now()}`);
-      localStorage.setItem("spin_user", JSON.stringify(data.user));
+      localStorage.setItem('spin_token', `spin_${Date.now()}`);
+      localStorage.setItem('spin_user', JSON.stringify(data.user));
 
       setTimeout(() => {
-        router.push("/artist/dashboard");
+        router.push('/artist/dashboard');
         router.refresh();
       }, 1500);
     } catch {
-      setError("Network error. Please try again.");
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   }
+
+  // Password strength indicator
+  const getStrength = (): { label: string; color: string; width: string } => {
+    if (password.length === 0) return { label: '', color: '', width: 'w-0' };
+    if (password.length < 6) return { label: 'Weak', color: 'bg-red-500', width: 'w-1/4' };
+    if (password.length < 8) return { label: 'Fair', color: 'bg-amber-500', width: 'w-2/4' };
+    if (password.length < 12) return { label: 'Good', color: 'bg-green-500', width: 'w-3/4' };
+    return { label: 'Strong', color: 'bg-green-500', width: 'w-full' };
+  };
+  const strength = getStrength();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black px-6">
@@ -65,7 +70,7 @@ export default function SignupPage() {
       <div className="relative w-full max-w-md animate-fade-in-up">
         <div className="text-center mb-8">
           <a href="/" className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            Spin<span className="gradient-text">Rec</span>
+            Spin<span className="text-violet-600 dark:text-violet-400">Rec</span>
           </a>
           <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
             Create your artist account
@@ -76,7 +81,7 @@ export default function SignupPage() {
           {success ? (
             <div className="text-center py-8">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -86,7 +91,10 @@ export default function SignupPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   {error}
                 </div>
               )}
@@ -134,6 +142,16 @@ export default function SignupPage() {
                   className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition-all"
                   placeholder="••••••••"
                 />
+                {password && (
+                  <div className="mt-2">
+                    <div className="h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden">
+                      <div className={`h-full rounded-full ${strength.color} ${strength.width} transition-all duration-300`} />
+                    </div>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      {strength.label && `${strength.label} password`}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -149,6 +167,12 @@ export default function SignupPage() {
                   className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 transition-all"
                   placeholder="••••••••"
                 />
+                {confirmPassword && confirmPassword !== password && (
+                  <p className="mt-1 text-xs text-red-500">Passwords do not match</p>
+                )}
+                {confirmPassword && confirmPassword === password && (
+                  <p className="mt-1 text-xs text-green-500">Passwords match</p>
+                )}
               </div>
 
               <button
@@ -156,13 +180,21 @@ export default function SignupPage() {
                 disabled={loading}
                 className="w-full py-3.5 rounded-full font-semibold text-sm bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-violet-500/25 transition-all duration-200"
               >
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Creating account...
+                  </span>
+                ) : 'Create Account'}
               </button>
             </form>
           )}
 
           <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <a href="/login" className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700">
               Sign in
             </a>

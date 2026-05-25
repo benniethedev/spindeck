@@ -2,10 +2,12 @@
  * SubmissionsList Component
  * Displays a list of submissions with status badges, artwork, and progress tracking.
  * Supports filtering, sorting, and empty states.
+ * Clickable rows that navigate to submission detail pages.
  */
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Submission, SubmissionStatus } from '@/types';
 import StatusBadge from './StatusBadge';
 
@@ -22,11 +24,16 @@ export default function SubmissionsList({
   onRefresh,
   filterStatus = 'all',
 }: SubmissionsListProps) {
+  const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const filtered = submissions.filter((s) =>
     filterStatus === 'all' ? true : s.status === filterStatus
   );
+
+  const handleClick = (id: string) => {
+    router.push(`/artist/submissions/${id}`);
+  };
 
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
@@ -83,7 +90,8 @@ export default function SubmissionsList({
             return (
               <div
                 key={sub.id}
-                className="px-6 py-5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                className="px-6 py-5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+                onClick={() => handleClick(sub.id)}
                 onMouseEnter={() => setHoveredId(sub.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
@@ -162,6 +170,7 @@ export default function SubmissionsList({
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 font-medium"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {link.label}
                           </a>

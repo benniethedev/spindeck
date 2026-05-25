@@ -259,7 +259,7 @@ export default function ArtistPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="#pricing"
+                href="/signup"
                 className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-zinc-900 dark:bg-white dark:text-zinc-900 text-white font-semibold text-base hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all duration-200 shadow-lg shadow-zinc-900/10 dark:shadow-white/5"
               >
                 View Pricing
@@ -532,7 +532,7 @@ export default function ArtistPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="#pricing"
+                  href="/signup"
                   className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-white text-violet-700 font-semibold text-base hover:bg-zinc-100 transition-all duration-200 shadow-lg"
                 >
                   Get Started Free
