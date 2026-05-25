@@ -1,6 +1,8 @@
+"use client";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import TrackCard from "./TrackCard";
 import { useDJ } from "@/app/dj/context/DJContext";
+import { useDJFilters } from "@/app/dj/context/DJFilterContext";
 
 interface Track {
   id: string;
@@ -110,15 +112,8 @@ interface TrackGridProps {
 
 export default function TrackGrid({ djApproved }: TrackGridProps) {
   const { user } = useDJ();
+  const { filters, setFilters } = useDJFilters();
   const [tracks, setTracks] = useState<Track[]>([]);
-  const [filters, setFilters] = useState({
-    genre: "All",
-    mood: "All",
-    bpmMin: 0,
-    bpmMax: 999,
-    search: "",
-  });
-  const [sortBy, setSortBy] = useState<"name" | "bpm" | "artist">("name");
   const [loading, setLoading] = useState(true);
   const [demoTrack, setDemoTrack] = useState<{ id: string; name: string } | null>(null);
 
@@ -173,25 +168,21 @@ export default function TrackGrid({ djApproved }: TrackGridProps) {
       return true;
     });
     result.sort((a, b) => {
-      if (sortBy === "bpm") return a.bpm - b.bpm;
-      if (sortBy === "artist") return a.artistName.localeCompare(b.artistName);
+      if (filters.sortBy === "bpm") return a.bpm - b.bpm;
+      if (filters.sortBy === "artist") return a.artistName.localeCompare(b.artistName);
       return a.trackName.localeCompare(b.trackName);
     });
     return result;
-  }, [tracks, filters, sortBy]);
-
-  const handleFilterChange = useCallback(
-    (newFilters: typeof filters) => {
-      setFilters(newFilters);
-    },
-    [],
-  );
+  }, [tracks, filters]);
 
   const handleDemoRequest = (trackId: string, trackName: string) => {
     setDemoTrack({ id: trackId, name: trackName });
   };
 
   const handleCloseModal = () => setDemoTrack(null);
+
+  // Active filter badges
+  const hasActiveFilters = filters.genre !== "All" || filters.mood !== "All";
 
   return (
     <>
@@ -203,8 +194,8 @@ export default function TrackGrid({ djApproved }: TrackGridProps) {
         <div className="flex items-center gap-2">
           <span className="text-xs text-zinc-500 dark:text-zinc-400">Sort by:</span>
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            value={filters.sortBy}
+            onChange={(e) => setFilters((f) => ({ ...f, sortBy: e.target.value as typeof filters.sortBy }))}
             className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
           >
             <option value="name">Name</option>
@@ -214,12 +205,12 @@ export default function TrackGrid({ djApproved }: TrackGridProps) {
         </div>
       </div>
 
-      {(filters.genre !== "All" || filters.mood !== "All") && (
+      {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 mb-4">
           {filters.genre !== "All" && (
             <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-xs font-medium">
               Genre: {filters.genre}
-              <button onClick={() => handleFilterChange({ ...filters, genre: "All" })} className="ml-0.5 hover:text-violet-900 dark:hover:text-violet-200">
+              <button onClick={() => setFilters((f) => ({ ...f, genre: "All" }))} className="ml-0.5 hover:text-violet-900 dark:hover:text-violet-200">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -229,7 +220,7 @@ export default function TrackGrid({ djApproved }: TrackGridProps) {
           {filters.mood !== "All" && (
             <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
               Mood: {filters.mood}
-              <button onClick={() => handleFilterChange({ ...filters, mood: "All" })} className="ml-0.5 hover:text-indigo-900 dark:hover:text-indigo-200">
+              <button onClick={() => setFilters((f) => ({ ...f, mood: "All" }))} className="ml-0.5 hover:text-indigo-900 dark:hover:text-indigo-200">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
