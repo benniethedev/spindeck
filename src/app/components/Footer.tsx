@@ -6,6 +6,7 @@ const footerLinks = {
   product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
+    { label: "How It Works", href: "#how-it-works" },
     { label: "DJ Pool", href: "/dj" },
     { label: "Submit Music", href: "/artist/submit" },
   ],
@@ -24,7 +25,7 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-zinc-950 text-zinc-400 pt-16 pb-8">
+    <footer className="bg-zinc-950 text-zinc-400 pt-16 pb-8" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2">
@@ -33,7 +34,8 @@ export default function Footer() {
               <span className="text-zinc-300">Rec</span>
             </a>
             <p className="text-sm text-zinc-500 leading-relaxed max-w-xs mb-6">
-              Connecting independent artists with 5,000+ professional DJs worldwide. Get your music played.
+              Connecting independent artists with 5,000+ professional DJs worldwide.
+              Get your music played.
             </p>
             <div className="flex items-center gap-4">
               <a href="#" aria-label="Twitter" className="hover:text-white transition-colors">

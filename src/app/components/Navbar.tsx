@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Pricing", href: "#pricing" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Testimonials", href: "#testimonials" },
+  { label: "DJ Pool", href: "/dj" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -34,13 +35,13 @@ export default function Navbar() {
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+        <a href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight" aria-label="SpinRec Home">
           <span className="gradient-text">Spin</span>
           <span className="text-zinc-700 dark:text-zinc-300">Rec</span>
         </a>
 
         {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <ul className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
@@ -56,24 +57,25 @@ export default function Navbar() {
         {/* Desktop CTA buttons */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="/artist"
+            href="/login"
             className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors px-3 py-2"
           >
             Log in
           </a>
           <a
-            href="/artist/submit"
-            className="gradient-bg text-white text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+            href="/dj/register"
+            className="gradient-bg text-white text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity shadow-md shadow-violet-500/20"
           >
-            Get Started
+            Join as DJ
           </a>
         </div>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          className="md:hidden p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileOpen ? (
@@ -102,7 +104,7 @@ export default function Navbar() {
             ))}
             <li className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
               <a
-                href="/artist"
+                href="/login"
                 className="block px-3 py-2.5 text-base font-medium text-zinc-700 dark:text-zinc-300"
                 onClick={() => setMobileOpen(false)}
               >
@@ -111,11 +113,11 @@ export default function Navbar() {
             </li>
             <li>
               <a
-                href="/artist/submit"
+                href="/dj/register"
                 className="block mx-3 mt-2 gradient-bg text-white text-center text-base font-medium px-4 py-3 rounded-full"
                 onClick={() => setMobileOpen(false)}
               >
-                Get Started
+                Join as DJ
               </a>
             </li>
           </ul>

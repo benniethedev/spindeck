@@ -6,30 +6,48 @@ const steps = [
   {
     step: "01",
     title: "Sign Up",
-    description: "Create your free artist account in under 2 minutes. Set up your profile, upload your bio, and add your social links.",
+    description:
+      "Create your free artist account in under 2 minutes. Set up your profile, add your bio, and connect your social links.",
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
       </svg>
     ),
   },
   {
     step: "02",
     title: "Submit Your Tracks",
-    description: "Upload your best work—MP3, WAV, or links to your SoundCloud/Spotify. Add genre tags, mood descriptors, and target playlists.",
+    description:
+      "Upload your best work—MP3, WAV, or links to your SoundCloud, Spotify, or Apple Music. Add genre tags and mood descriptors.",
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+        />
       </svg>
     ),
   },
   {
     step: "03",
     title: "Get Promoted",
-    description: "Your tracks reach our curated pool of 5,000+ DJs worldwide. Get playlist adds, remix offers, and real feedback from industry pros.",
+    description:
+      "Your tracks reach our curated pool of 5,000+ DJs worldwide. Get playlist adds, remix offers, and real feedback from industry pros.",
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
       </svg>
     ),
   },
@@ -37,10 +55,17 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 sm:py-32 bg-white dark:bg-zinc-950">
+    <section
+      id="how-it-works"
+      className="py-24 sm:py-32 bg-white dark:bg-zinc-950"
+      aria-label="How it works"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="text-sm font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-3 block">
+            Simple Process
+          </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-4">
             How It Works
           </h2>
@@ -65,8 +90,10 @@ export default function HowItWorks() {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">{item.title}</h3>
-              <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xs mx-auto">
+              <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">
+                {item.title}
+              </h3>
+              <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
                 {item.description}
               </p>
             </div>
