@@ -1,6 +1,7 @@
 /**
  * Hero - Main landing page hero section
- * Promote your music to top DJs worldwide
+ * DESIGN.md: violet-to-indigo gradients, dark zinc backgrounds, Geist Sans
+ * WCAG AA: visible focus states, semantic HTML, ARIA labels
  */
 
 export default function Hero() {
@@ -19,11 +20,11 @@ export default function Hero() {
         }}
       />
 
-      {/* Background gradient orbs */}
+      {/* Background gradient orbs — DESIGN.md glow-accent style */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-violet-200 dark:bg-violet-900/30 rounded-full blur-3xl opacity-30" />
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-200 dark:bg-indigo-900/30 rounded-full blur-3xl opacity-30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-fuchsia-100 dark:bg-fuchsia-900/20 rounded-full blur-3xl opacity-20" />
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-violet-300 dark:bg-violet-900/40 rounded-full blur-3xl opacity-25" />
+        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-300 dark:bg-indigo-900/40 rounded-full blur-3xl opacity-25" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-fuchsia-200 dark:bg-fuchsia-900/20 rounded-full blur-3xl opacity-15" />
         {/* Accent glow at top center */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-violet-400/10 via-violet-300/5 to-transparent rounded-full blur-3xl" />
       </div>
@@ -33,7 +34,8 @@ export default function Hero() {
         <div className="animate-fade-in-up">
           <a
             href="#pricing"
-            className="inline-flex items-center gap-2 text-sm font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 rounded-full px-4 py-1.5 mb-8"
+            className="inline-flex items-center gap-2 text-sm font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 rounded-full px-4 py-1.5 hover:bg-violet-100 dark:hover:bg-violet-950/60 transition-colors"
+            aria-label="See pricing plans"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
@@ -71,27 +73,17 @@ export default function Hero() {
         >
           <a
             href="#pricing"
-            className="w-full sm:w-auto gradient-bg text-white font-semibold px-8 py-4 rounded-full text-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-violet-500/25"
+            className="w-full sm:w-auto gradient-bg text-white font-semibold px-8 py-4 rounded-full text-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-violet-500/25 focus-visible-ring"
           >
             View Pricing Plans
           </a>
           <a
             href="#how-it-works"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 px-8 py-4 rounded-full text-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 px-8 py-4 rounded-full text-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors focus-visible-ring"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             See How It Works
           </a>
@@ -139,7 +131,10 @@ export default function Hero() {
           </p>
           <div className="flex items-center justify-center gap-8 flex-wrap opacity-40 dark:opacity-30">
             {["Spotify", "SoundCloud", "Bandcamp", "Beatport"].map((brand) => (
-              <span key={brand} className="text-sm font-bold text-zinc-400 dark:text-zinc-500 tracking-wider">
+              <span
+                key={brand}
+                className="text-sm font-bold text-zinc-400 dark:text-zinc-500 tracking-wider"
+              >
                 {brand}
               </span>
             ))}

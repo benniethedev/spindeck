@@ -1,5 +1,6 @@
 /**
  * Testimonials - Social proof from featured artists
+ * DESIGN.md: cards with borders, hover shadows, gradient avatars
  */
 
 const testimonials = [
@@ -62,11 +63,15 @@ const stats = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="py-24 sm:py-32 bg-zinc-50 dark:bg-zinc-900/50">
+    <section
+      id="testimonials"
+      className="py-24 sm:py-32 bg-zinc-50 dark:bg-zinc-950/50"
+      aria-label="Testimonials from artists"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-sm font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-3 block">
+          <span className="text-sm font-semibold uppercase tracking-widest gradient-text mb-3 block">
             Social Proof
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-4">
@@ -78,7 +83,7 @@ export default function Testimonials() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20" aria-label="Platform statistics">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl sm:text-4xl font-extrabold gradient-text mb-1">
@@ -99,7 +104,7 @@ export default function Testimonials() {
               className="bg-white dark:bg-zinc-800 rounded-2xl p-8 border border-zinc-200 dark:border-zinc-700 hover:shadow-lg hover:border-violet-200 dark:hover:border-violet-800 transition-all duration-300 flex flex-col"
             >
               {/* Stars */}
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-4" aria-label="5 out of 5 stars">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <svg
                     key={i}
@@ -118,6 +123,7 @@ export default function Testimonials() {
               <div className="flex items-center gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-700">
                 <div
                   className={`w-11 h-11 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
+                  aria-hidden="true"
                 >
                   {t.avatar}
                 </div>

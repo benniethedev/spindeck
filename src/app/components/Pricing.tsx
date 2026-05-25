@@ -1,7 +1,7 @@
 /**
  * Pricing - Three main pricing tiers with Stripe integration
- * Includes an inline email/name collection form for non-authenticated users
- * before redirecting to Stripe Checkout.
+ * DESIGN.md: violet-to-indigo gradients, rounded cards, hover states
+ * WCAG AA: visible focus states, proper contrast, ARIA labels
  */
 'use client';
 
@@ -77,7 +77,7 @@ const plans: Plan[] = [
 ];
 
 /**
- * Collect user email/name, then create Stripe Checkout session and redirect.
+ * Create Stripe Checkout session via API and redirect.
  */
 async function initiateCheckout(
   planKey: string,
@@ -109,7 +109,6 @@ async function initiateCheckout(
     }
 
     if (data.url) {
-      // Store the session ID in sessionStorage for the welcome page
       sessionStorage.setItem('pending_stripe_session', data.sessionId);
       window.location.href = data.url;
     }
@@ -120,9 +119,6 @@ async function initiateCheckout(
   }
 }
 
-/**
- * Inline signup form that collects email + name before Stripe checkout.
- */
 function CheckoutForm({
   plan,
   onClose,
@@ -166,7 +162,7 @@ function CheckoutForm({
     <div>
       <div className="text-center mb-6">
         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-          Choose your <span className="text-violet-600 dark:text-violet-400">{plan.name}</span> plan
+          Choose your <span className="gradient-text">{plan.name}</span> plan
         </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           {plan.price}{plan.period} — Enter your details to get started
@@ -174,7 +170,10 @@ function CheckoutForm({
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+        <div
+          className="mb-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -212,7 +211,7 @@ function CheckoutForm({
 
         <button
           type="submit"
-          className="w-full py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 shadow-lg shadow-violet-500/25 transition-all duration-200"
+          className="w-full py-3 rounded-full font-semibold text-sm gradient-bg text-white hover:opacity-90 disabled:opacity-50 shadow-lg shadow-violet-500/25 transition-all duration-200 focus-visible-ring"
         >
           Continue to Payment →
         </button>
@@ -224,7 +223,7 @@ function CheckoutForm({
 
       <button
         onClick={onClose}
-        className="mt-3 w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+        className="mt-3 w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors focus-visible-ring px-2 py-1 rounded"
       >
         ← Back to pricing
       </button>
@@ -238,11 +237,11 @@ export default function Pricing() {
   const [selectedPlan, setSelectedPlan] = useState<(typeof plans)[0] | null>(null);
 
   return (
-    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-zinc-950">
+    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-zinc-950" aria-label="Pricing">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-sm font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-3 block">
+          <span className="text-sm font-semibold uppercase tracking-widest gradient-text mb-3 block">
             Pricing
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-4">
@@ -255,21 +254,23 @@ export default function Pricing() {
 
         {/* Overlay for checkout form */}
         {selectedPlan && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Checkout"
+          >
             <div className="w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 shadow-2xl border border-zinc-200 dark:border-zinc-800 p-8 relative">
               <button
                 onClick={() => setSelectedPlan(null)}
-                className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                aria-label="Close"
+                className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors p-1 focus-visible-ring rounded"
+                aria-label="Close checkout"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <CheckoutForm
-                plan={selectedPlan}
-                onClose={() => setSelectedPlan(null)}
-              />
+              <CheckoutForm plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
             </div>
           </div>
         )}
@@ -281,9 +282,11 @@ export default function Pricing() {
               key={plan.name}
               className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 ${
                 plan.highlighted
-                  ? 'gradient-bg text-white shadow-2xl shadow-violet-500/30 scale-[1.02] md:scale-105 ring-1 ring-white/20'
+                  ? 'gradient-bg text-white shadow-2xl shadow-violet-500/30 ring-1 ring-white/20'
                   : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg'
               }`}
+              role="article"
+              aria-label={`${plan.name} plan - ${plan.price}${plan.period}`}
             >
               {plan.badge && (
                 <span
@@ -330,7 +333,7 @@ export default function Pricing() {
                 </div>
               </div>
 
-              <ul className="space-y-3 mb-8 flex-1">
+              <ul className="space-y-3 mb-8 flex-1" aria-label={`${plan.name} features`}>
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <svg
@@ -364,7 +367,7 @@ export default function Pricing() {
                     plan.highlighted
                       ? 'bg-white text-violet-600 hover:bg-violet-50'
                       : 'gradient-bg text-white hover:opacity-90'
-                  }`}
+                  } focus-visible-ring`}
                 >
                   {plan.cta}
                 </a>
@@ -376,7 +379,7 @@ export default function Pricing() {
                     plan.highlighted
                       ? 'bg-white text-violet-600 hover:bg-violet-50 disabled:opacity-60'
                       : 'gradient-bg text-white hover:opacity-90 disabled:opacity-60'
-                  }`}
+                  } focus-visible-ring`}
                 >
                   {loading && loadingPlan === plan.planKey
                     ? 'Processing...'

@@ -1,5 +1,6 @@
 /**
  * Navbar - Global navigation for SpinRec
+ * Mobile-first, accessible, with DESIGN.md violet/indigo styling
  */
 "use client";
 
@@ -11,8 +12,6 @@ const navLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "DJ Pool", href: "/dj" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -32,10 +31,19 @@ export default function Navbar() {
           ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800"
           : "bg-transparent"
       }`}
+      role="banner"
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <nav
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight" aria-label="SpinRec Home">
+        <a
+          href="/"
+          className="flex items-center gap-2 text-xl font-bold tracking-tight focus-visible-ring"
+          aria-label="SpinRec Home"
+        >
           <span className="gradient-text">Spin</span>
           <span className="text-zinc-700 dark:text-zinc-300">Rec</span>
         </a>
@@ -46,7 +54,7 @@ export default function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors"
+                className="text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors focus-visible-ring px-1"
               >
                 {link.label}
               </a>
@@ -58,24 +66,25 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <a
             href="/login"
-            className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors px-3 py-2"
+            className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors px-3 py-2 focus-visible-ring"
           >
             Log in
           </a>
           <a
-            href="/dj/register"
-            className="gradient-bg text-white text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity shadow-md shadow-violet-500/20"
+            href="/signup"
+            className="gradient-bg text-white text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity shadow-md shadow-violet-500/20 focus-visible-ring"
           >
-            Join as DJ
+            Join as Artist
           </a>
         </div>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="md:hidden p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible-ring"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileOpen ? (
@@ -89,13 +98,18 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 animate-fade-in">
+        <div
+          id="mobile-menu"
+          className="md:hidden bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 animate-fade-in"
+          role="dialog"
+          aria-label="Mobile navigation"
+        >
           <ul className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="block px-3 py-2.5 text-base font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-colors"
+                  className="block px-3 py-2.5 text-base font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-colors focus-visible-ring"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
@@ -105,7 +119,7 @@ export default function Navbar() {
             <li className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
               <a
                 href="/login"
-                className="block px-3 py-2.5 text-base font-medium text-zinc-700 dark:text-zinc-300"
+                className="block px-3 py-2.5 text-base font-medium text-zinc-700 dark:text-zinc-300 hover:text-violet-600 focus-visible-ring rounded-lg"
                 onClick={() => setMobileOpen(false)}
               >
                 Log in
@@ -113,11 +127,11 @@ export default function Navbar() {
             </li>
             <li>
               <a
-                href="/dj/register"
-                className="block mx-3 mt-2 gradient-bg text-white text-center text-base font-medium px-4 py-3 rounded-full"
+                href="/signup"
+                className="block mx-3 mt-2 gradient-bg text-white text-center text-base font-medium px-4 py-3 rounded-full hover:opacity-90 focus-visible-ring"
                 onClick={() => setMobileOpen(false)}
               >
-                Join as DJ
+                Join as Artist
               </a>
             </li>
           </ul>
