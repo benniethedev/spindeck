@@ -1,4 +1,4 @@
-"use client";
+content = '''"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -185,3 +185,8 @@ export default function DashboardPage() {
     </div>
   );
 }
+'''
+
+with open('/home/benbond/Documents/spinrec/src/app/artist/dashboard/page.tsx', 'w') as f:
+    f.write(content)
+print(f'Dashboard rewritten: {len(content)} bytes')
