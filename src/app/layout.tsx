@@ -12,35 +12,86 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const metadataBase = new URL(
-  process.env.NEXT_PUBLIC_BASE_URL || "https://spinrec.com"
-);
-
 export const metadata: Metadata = {
-  metadataBase,
-  title: {
-    default: "SpinRec — Promote Your Music to Top DJs",
-    template: "%s | SpinRec",
-  },
-  description: "Submit your music to thousands of curated DJs worldwide. Get approved, get promoted, and grow your audience with SpinRec's artist platform.",
-  keywords: ["artist promotion", "DJ pool", "music submission", "independent artist", "music marketing", "DJ directory"],
+  title: "SpinRec — Promote Your Music to Top DJs",
+  description:
+    "SpinRec connects independent artists with top DJs, bloggers, and music influencers. Submit your track and get real DJ plays, engagement, and career growth.",
+  keywords: [
+    "music promotion",
+    "DJ pool",
+    "music submission",
+    "independent artist",
+    "music marketing",
+    "DJ networking",
+    "electronic music",
+    "house music promotion",
+    "techno promotion",
+    "hip-hop promotion",
+  ],
   authors: [{ name: "SpinRec" }],
-  robots: "index, follow",
+  creator: "SpinRec",
+  publisher: "SpinRec",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.spinrec.com"
+  ),
   openGraph: {
+    title: "SpinRec — Promote Your Music to Top DJs",
+    description:
+      "Connect with 500+ DJs worldwide. Submit your track, get real plays, and grow your audience.",
     type: "website",
     locale: "en_US",
     siteName: "SpinRec",
-    title: "SpinRec — Promote Your Music to Top DJs",
-    description: "Submit your music to thousands of curated DJs worldwide.",
-    images: ["/og-image.png"],
+    url: "/",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "SpinRec — Music Promotion Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@spinrec",
-    creator: "@spinrec",
     title: "SpinRec — Promote Your Music to Top DJs",
-    description: "Submit your music to thousands of curated DJs worldwide.",
-    images: ["/og-image.png"],
+    description:
+      "Connect with 500+ DJs worldwide. Submit your track, get real plays, and grow your audience.",
+    images: ["/og-image.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: {
+    // Add your verification tokens when available
+    // google: 'your-google-verification-token',
+  },
+};
+
+// JSON-LD structured data for SEO
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "SpinRec",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.spinrec.com",
+  description:
+    "Music promotion platform connecting independent artists with top DJs worldwide.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "{search_term_string}",
+    "query-input": "required name=search_term_string",
   },
 };
 
@@ -52,9 +103,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
+      <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+        {children}
+      </body>
     </html>
   );
 }

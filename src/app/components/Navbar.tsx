@@ -1,142 +1,119 @@
 /**
- * Navbar - Global navigation for SpinRec
- * Mobile-first, accessible, with DESIGN.md violet/indigo styling
+ * Public Navbar - Navigation for the public-facing landing page
+ * Includes links to pricing, about, and auth
  */
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-
-const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "DJ Pool", href: "/dj" },
-];
+import { useState } from 'react';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800"
-          : "bg-transparent"
-      }`}
-      role="banner"
-    >
-      <nav
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
-        role="navigation"
-        aria-label="Main navigation"
-      >
-        {/* Logo */}
-        <a
-          href="/"
-          className="flex items-center gap-2 text-xl font-bold tracking-tight focus-visible-ring"
-          aria-label="SpinRec Home"
-        >
-          <span className="gradient-text">Spin</span>
-          <span className="text-zinc-700 dark:text-zinc-300">Rec</span>
-        </a>
-
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors focus-visible-ring px-1"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Desktop CTA buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          <a
-            href="/login"
-            className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors px-3 py-2 focus-visible-ring"
-          >
-            Log in
+    <nav className="sticky top-0 z-50 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <a href="/" className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+            Spin<span className="text-violet-600 dark:text-violet-400">Rec</span>
           </a>
-          <a
-            href="/signup"
-            className="gradient-bg text-white text-sm font-medium px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity shadow-md shadow-violet-500/20 focus-visible-ring"
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#pricing" className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors">
+              Pricing
+            </a>
+            <a href="#features" className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors">
+              Features
+            </a>
+            <a href="#how-it-works" className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors">
+              How It Works
+            </a>
+            <a href="#faq" className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors">
+              FAQ
+            </a>
+            <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-700" />
+            <a
+              href="/artist/login"
+              className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors"
+            >
+              Log in
+            </a>
+            <a
+              href="/artist/signup"
+              className="text-sm font-semibold px-5 py-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20 transition-all hover:shadow-lg hover:shadow-violet-500/30"
+            >
+              Get Started
+            </a>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 rounded-lg text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors"
+            aria-label="Toggle menu"
           >
-            Join as Artist
-          </a>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus-visible-ring"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          aria-controls="mobile-menu"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </nav>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div
-          id="mobile-menu"
-          className="md:hidden bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 animate-fade-in"
-          role="dialog"
-          aria-label="Mobile navigation"
-        >
-          <ul className="px-4 py-4 space-y-1">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="block px-3 py-2.5 text-base font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg transition-colors focus-visible-ring"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-            <li className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="md:hidden py-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex flex-col gap-3">
               <a
-                href="/login"
-                className="block px-3 py-2.5 text-base font-medium text-zinc-700 dark:text-zinc-300 hover:text-violet-600 focus-visible-ring rounded-lg"
+                href="#pricing"
                 onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors py-2"
+              >
+                Pricing
+              </a>
+              <a
+                href="#features"
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors py-2"
+              >
+                Features
+              </a>
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors py-2"
+              >
+                How It Works
+              </a>
+              <a
+                href="#faq"
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-zinc-600 hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400 transition-colors py-2"
+              >
+                FAQ
+              </a>
+              <div className="w-px h-px bg-zinc-200 dark:bg-zinc-700" />
+              <a
+                href="/artist/login"
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-zinc-700 hover:text-violet-600 dark:text-zinc-300 dark:hover:text-violet-400 transition-colors py-2"
               >
                 Log in
               </a>
-            </li>
-            <li>
               <a
-                href="/signup"
-                className="block mx-3 mt-2 gradient-bg text-white text-center text-base font-medium px-4 py-3 rounded-full hover:opacity-90 focus-visible-ring"
+                href="/artist/signup"
                 onClick={() => setMobileOpen(false)}
+                className="text-sm font-semibold px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-center hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20 transition-all"
               >
-                Join as Artist
+                Get Started
               </a>
-            </li>
-          </ul>
-        </div>
-      )}
-    </header>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
   );
 }

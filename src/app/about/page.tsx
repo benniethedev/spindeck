@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "About SpinRec — Our Mission",
     description: "Connecting independent artists with professional DJs worldwide.",
     url: "/about",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
 };
 
