@@ -2,21 +2,214 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 html,
 body {
-  scroll-behavior: smooth !important;
+  scroll-behavior: smooth;
+  background-color: #050505;
+  color: #e5e2e1;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* It makes the HTML progress bar filling smooth when value change. */
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3939; }
+
+/* Glow effect for CTAs */
+.glow-accent { filter: drop-shadow(0 0 20px rgba(255, 80, 50, 0.35)); }
+.glow-accent-strong { filter: drop-shadow(0 0 40px rgba(255, 80, 50, 0.5)); }
+
+/* Thermal gradient */
+.thermal-gradient {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF7A59 100%);
+}
+.thermal-gradient-text {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF7A59 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-subtle {
+  background: rgba(19, 19, 19, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Ambient glow backgrounds */
+.ambient-glow { position: relative; }
+.ambient-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255, 80, 50, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.ambient-glow > * { position: relative; z-index: 1; }
+
+/* Card styles per DESIGN.md */
+.deck-card {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 24px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.deck-card:hover {
+  border-color: rgba(255, 80, 50, 0.3);
+  box-shadow: 0 0 30px rgba(255, 80, 50, 0.08);
+}
+.stage-card {
+  background: #0E0E0E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  transition: border-color 0.3s ease;
+}
+.stage-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Typography per DESIGN.md */
+.headline-xl {
+  font-family: 'Geist', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 56px;
+  letter-spacing: -0.04em;
+}
+.headline-xl-mobile {
+  font-size: 32px;
+  line-height: 38px;
+  letter-spacing: -0.02em;
+}
+.headline-lg {
+  font-family: 'Geist', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+}
+.headline-md {
+  font-family: 'Geist', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+.body-lg {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+}
+.body-md {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+.label-md {
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.label-sm {
+  font-family: 'Geist', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Primary CTA button per DESIGN.md */
+.btn-primary-cta {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF7A59 100%);
+  color: white;
+  font-family: 'Geist', sans-serif;
+  font-weight: 600;
+  border-radius: 1rem;
+  padding: 16px 32px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-primary-cta:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 80, 50, 0.5));
+  transform: translateY(-1px);
+}
+.btn-primary-cta:active {
+  transform: translateY(0);
+}
+
+.btn-secondary-cta {
+  background: transparent;
+  color: white;
+  font-family: 'Geist', sans-serif;
+  font-weight: 600;
+  border-radius: 1rem;
+  padding: 16px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-secondary-cta:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Cinematic gap between sections */
+.cinematic-gap {
+  margin-top: 100px;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 80, 50, 0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Pulse for live indicators */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1); opacity: 0.2; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+.pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Smooth progress bar */
 progress::-webkit-progress-value {
   transition: 0.6s width ease-out;
-}
-
-@layer base {
-  .btn-gradient {
-    @apply !bg-gradient !bg-[length:300%_300%] hover:saturate-[1.2] shadow duration-100 !border-0 !border-transparent !bg-transparent animate-shimmer disabled:!bg-none disabled:!bg-gray-500/30  !text-white;
-  }
-  .btn {
-    @apply !capitalize;
-  }
 }

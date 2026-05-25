@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://spinrec.com/apple-icon.png</loc><lastmod>2026-01-30T15:11:47.373Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/signin</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/blog</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/about</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/pricing</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/contact</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/privacy-policy</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/tos</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com/dj-pool</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://spinrec.com</loc><lastmod>2026-01-30T15:11:47.374Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/apple-icon.png</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/unsubscribe</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/signup</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/signin</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/forgot-password</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/pricing</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/contact</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/dj-pool</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/about</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/privacy-policy</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://spinrec.com/tos</loc><lastmod>2026-05-25T13:21:13.817Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>
