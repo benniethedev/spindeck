@@ -3,11 +3,8 @@
  * Public storefront for the DJ network
  */
 import type { Metadata } from "next";
-import DJNavbar from "@/app/dj/components/DJNavbar";
 import DJFilters from "@/app/dj/components/DJFilters";
 import TrackGrid from "@/app/dj/components/TrackGrid";
-import Footer from "@/app/dj/components/Footer";
-import { DJProvider } from "@/app/dj/context/DJContext";
 import Link from "next/link";
 
 export const generateMetadata = (): Metadata => ({
@@ -63,7 +60,7 @@ function HeroSection() {
           </h1>
 
           <p className="text-lg sm:text-xl text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
-            Browse 500+ tracks from emerging artists. Preview with 30s audio clips,
+            Browse tracks from emerging artists. Preview with 30s audio clips,
             filter by genre, BPM, and mood, then request full downloads.
           </p>
 
@@ -154,7 +151,7 @@ function HowItWorksSection() {
                 </svg>
               ),
               title: "Request Download",
-              desc: "Click request and we'll send you the full track file via email.",
+              desc: "Click request and we will send you the full track file via email.",
             },
           ].map((item) => (
             <div
@@ -214,9 +211,7 @@ function DJCTASection() {
 
 function DJPoolPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
-      <DJNavbar />
-
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       {/* Hero */}
       <HeroSection />
 
@@ -242,16 +237,8 @@ function DJPoolPage() {
 
       {/* CTA */}
       <DJCTASection />
-
-      <Footer />
     </div>
   );
 }
 
-export default function Page() {
-  return (
-    <DJProvider>
-      <DJPoolPage />
-    </DJProvider>
-  );
-}
+export default DJPoolPage;

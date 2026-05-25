@@ -4,7 +4,7 @@
 import type { Metadata } from "next";
 import { DJProvider } from "@/app/dj/context/DJContext";
 import { DJFilterProvider } from "@/app/dj/context/DJFilterContext";
-import Navbar from "@/app/components/Navbar";
+import DJNavbar from "@/app/dj/components/DJNavbar";
 import Footer from "@/app/dj/components/Footer";
 
 export const generateMetadata = (): Metadata => ({
@@ -27,7 +27,7 @@ export default function DJLayout({ children }: { children: React.ReactNode }) {
     <DJProvider>
       <DJFilterProvider>
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
-          <Navbar />
+          <DJNavbar />
           <div className="flex-1">{children}</div>
           <Footer />
         </div>
