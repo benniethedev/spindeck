@@ -27,30 +27,30 @@ export async function createCampaign(data: Omit<Campaign, "id" | "createdAt" | "
     createdAt: now,
     updatedAt: now,
   });
-  return { ...record.data, id: record.id } as unknown as Campaign;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Campaign;
 }
 
 export async function getCampaign(slug: string): Promise<Campaign | null> {
   const record = await getRecord(CAMPAIGN_KEY(slug));
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Campaign;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Campaign;
 }
 
 export async function getCampaignById(id: string): Promise<Campaign | null> {
   const record = await getRecordById(id);
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Campaign;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Campaign;
 }
 
 export async function updateCampaign(slug: string, updates: Partial<Campaign>): Promise<Campaign> {
   const record = await getRecord(CAMPAIGN_KEY(slug));
   if (!record) throw new Error(`Campaign not found: ${slug}`);
   const updated = await updateRecord(record.id, {
-    ...record.data,
+    ...(record.data as Record<string, any>),
     ...updates,
     updatedAt: new Date().toISOString(),
   });
-  return { ...updated.data, id: updated.id } as unknown as Campaign;
+  return { ...(updated.data as Record<string, any>), id: updated.id } as unknown as Campaign;
 }
 
 export async function deleteCampaign(slug: string): Promise<void> {
@@ -103,17 +103,17 @@ export async function updateCampaignMetrics(
 // ---- Query helpers ----
 
 export async function getDraftCampaigns(): Promise<Campaign[]> {
-  const records = await listByType<Record<string, unknown>>("campaign", { status: "draft" });
-  return records.map(r => ({ ...r.data, id: r.id } as unknown as Campaign));
+  const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("campaign", { status: "draft" });
+  return records.map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Campaign));
 }
 
 export async function getScheduledCampaigns(): Promise<Campaign[]> {
-  const records = await listByType<Record<string, unknown>>("campaign", { status: "scheduled" });
-  return records.map(r => ({ ...r.data, id: r.id } as unknown as Campaign));
+  const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("campaign", { status: "scheduled" });
+  return records.map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Campaign));
 }
 
 export async function getRecentCampaigns(limit: number = 20): Promise<Campaign[]> {
-  const records = await listByType<Record<string, unknown>>("campaign");
-  const campaigns = records.map(r => ({ ...r.data, id: r.id } as unknown as Campaign));
+  const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("campaign");
+  const campaigns = records.map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Campaign));
   return campaigns.slice(0, limit);
 }

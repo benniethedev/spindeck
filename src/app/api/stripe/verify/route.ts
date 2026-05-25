@@ -5,15 +5,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-04-22.dahlia',
-});
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+
+function getStripe(): Stripe | null {
+  if (!STRIPE_SECRET_KEY) {
+    console.warn('[stripe] STRIPE_SECRET_KEY not configured');
+    return null;
+  }
+  return new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2026-04-22.dahlia' });
+}
 
 export async function GET(req: NextRequest) {
   const sessionId = req.nextUrl.searchParams.get('session_id');
 
   if (!sessionId) {
     return NextResponse.json({ error: 'Missing session_id' }, { status: 400 });
+  }
+
+  const stripe = getStripe();
+  if (!stripe) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
   }
 
   try {

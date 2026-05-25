@@ -6,9 +6,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-04-22.dahlia',
-});
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+
+function getStripe(): Stripe | null {
+  if (!STRIPE_SECRET_KEY) {
+    console.warn('[stripe] STRIPE_SECRET_KEY not configured — Stripe calls will fail silently');
+    return null;
+  }
+  return new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2026-04-22.dahlia' });
+}
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
@@ -64,6 +70,10 @@ export async function POST(req: NextRequest) {
     let effectivePriceId = priceId;
     if (!priceId) {
       try {
+        const stripe = getStripe();
+        if (!stripe) {
+          throw new Error('Stripe not configured');
+        }
         const product = await stripe.products.create({
           name: `SpinRec ${planName} Plan`,
           description: `${planName} plan for artist promotion on SpinRec`,
@@ -127,6 +137,9 @@ export async function POST(req: NextRequest) {
       allow_promotion_codes: planKey !== 'enterprise',
       billing_address_collection: 'required',
     };
+
+    const stripe = getStripe();
+    if (!stripe) throw new Error('Stripe not configured');
 
     const session = await stripe.checkout.sessions.create(params);
 

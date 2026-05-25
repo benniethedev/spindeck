@@ -22,30 +22,30 @@ export async function createPurchase(data: Omit<Purchase, "id" | "createdAt" | "
     createdAt: now,
     updatedAt: now,
   });
-  return { ...record.data, id: record.id } as unknown as Purchase;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Purchase;
 }
 
 export async function getPurchaseByStripeId(stripePaymentId: string): Promise<Purchase | null> {
   const record = await getRecord(PURCHASE_KEY(stripePaymentId));
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Purchase;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Purchase;
 }
 
 export async function getPurchaseById(id: string): Promise<Purchase | null> {
   const record = await getRecordById(id);
   if (!record) return null;
-  return { ...record.data, id: record.id } as unknown as Purchase;
+  return { ...(record.data as Record<string, any>), id: record.id } as unknown as Purchase;
 }
 
 export async function updatePurchase(id: string, updates: Partial<Purchase>): Promise<Purchase> {
   const record = await getRecordById(id);
   if (!record) throw new Error(`Purchase not found: ${id}`);
   const updated = await updateRecord(record.id, {
-    ...record.data,
+    ...(record.data as Record<string, any>),
     ...updates,
     updatedAt: new Date().toISOString(),
   });
-  return { ...updated.data, id: updated.id } as unknown as Purchase;
+  return { ...(updated.data as Record<string, any>), id: updated.id } as unknown as Purchase;
 }
 
 export async function deletePurchase(id: string): Promise<void> {
@@ -82,7 +82,7 @@ export async function handleStripeEvent(
       break;
   }
 
-  return updatePurchase(purchase.id, { status });
+  return updatePurchase((purchase as any).id || purchase.stripePaymentId, { status });
 }
 
 // ---- Query helpers ----
@@ -91,20 +91,20 @@ export async function getPurchasesByRecipient(
   recipientId: string,
   recipientType: "dj" | "artist",
 ): Promise<Purchase[]> {
-  const records = await listByType<Record<string, unknown>>("purchase");
+  const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("purchase");
   return records
     .filter(r => {
       const d = r.data as Record<string, unknown>;
       return (d.recipientId as string) === recipientId && (d.recipientType as string) === recipientType;
     })
-    .map(r => ({ ...r.data, id: r.id } as unknown as Purchase));
+    .map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Purchase));
 }
 
 export async function getPurchasesByStripeCustomer(
   stripeCustomerId: string,
 ): Promise<Purchase[]> {
-  const records = await listByType<Record<string, unknown>>("purchase");
+  const records = await listByType<{ id: string; key: string; data: Record<string, unknown> }>("purchase");
   return records
     .filter(r => (r.data as Record<string, unknown>).stripeCustomerId === stripeCustomerId)
-    .map(r => ({ ...r.data, id: r.id } as unknown as Purchase));
+    .map(r => ({ ...(r.data as Record<string, any>), id: r.id } as unknown as Purchase));
 }

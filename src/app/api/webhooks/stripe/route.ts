@@ -19,11 +19,16 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { createRecord, updateRecord, getRecord } from '@/lib/storeai';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-04-22.dahlia',
-});
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 
-const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+function getStripe(): Stripe {
+  if (!STRIPE_SECRET_KEY) {
+    console.warn('[stripe] STRIPE_SECRET_KEY not configured — Stripe calls will fail silently');
+    return new Stripe('sk_test_placeholder', { apiVersion: '2026-04-22.dahlia' }) as unknown as Stripe;
+  }
+  return new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2026-04-22.dahlia' });
+}
 
 type EventHandler = (event: Stripe.Event) => Promise<void>;
 
@@ -171,7 +176,7 @@ export async function POST(req: Request) {
   const signature = headersList.get('stripe-signature') as string;
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, signature, WEBHOOK_SECRET);
+    event = getStripe().webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     console.error('[webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
@@ -199,7 +204,7 @@ async function handlePaymentSuccess(session: Stripe.Checkout.Session) {
     const artistName = metadata.artist_name || '';
     let subDetails: Stripe.Subscription | undefined;
     if (subscription && typeof subscription === 'string') {
-      subDetails = await stripe.subscriptions.retrieve(subscription);
+      subDetails = await getStripe().subscriptions.retrieve(subscription);
     } else if (subscription && typeof subscription === 'object') {
       subDetails = subscription as Stripe.Subscription;
     }

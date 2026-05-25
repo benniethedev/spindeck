@@ -25,7 +25,13 @@ export type Status =
   | "active"
   | "archived"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "draft"
+  | "scheduled"
+  | "sending"
+  | "sent"
+  | "failed"
+  | "refunded";
 
 export type Genre =
   | "hip-hop"
